@@ -1,24 +1,112 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13122.16" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13104.12"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22685"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--View Controller-->
+        <!--ImageList-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="ViewController" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="ImageList" id="BYZ-38-t0r" customClass="ImagesListViewController" customModule="ImageFeed" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" xcode11CocoaTouchSystemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" estimatedSectionHeaderHeight="-1" sectionFooterHeight="28" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="wYG-Ow-KWR">
+                                <rect key="frame" x="1" y="59" width="392" height="793"/>
+                                <color key="backgroundColor" name="YP Background"/>
+                                <prototypes>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationWidth="10" reuseIdentifier="ImagesListCell" rowHeight="224" id="RRA-NL-hTi" customClass="ImagesListCell" customModule="ImageFeed" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="50" width="392" height="224"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="RRA-NL-hTi" id="LH8-Ig-syW">
+                                            <rect key="frame" x="0.0" y="0.0" width="392" height="224"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" image="0" translatesAutoresizingMaskIntoConstraints="NO" id="Yyk-2v-65v" userLabel="Cell image">
+                                                    <rect key="frame" x="0.0" y="0.0" width="382" height="216"/>
+                                                    <userDefinedRuntimeAttributes>
+                                                        <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                                            <integer key="value" value="16"/>
+                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="layer.masksToBounds" value="YES"/>
+                                                    </userDefinedRuntimeAttributes>
+                                                </imageView>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eci-xt-EjU">
+                                                    <rect key="frame" x="332" y="0.0" width="44" height="44"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" constant="44" id="Tln-AI-1zl"/>
+                                                        <constraint firstAttribute="height" constant="44" id="jwA-kd-4F0"/>
+                                                    </constraints>
+                                                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                                    <state key="normal" image="No Active"/>
+                                                </button>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="22 августа 2022" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IoN-Jo-hdX">
+                                                    <rect key="frame" x="24" y="196.33333333333334" width="344" height="15.666666666666657"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                                                    <color key="textColor" name="YP White"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <color key="backgroundColor" name="YP Background"/>
+                                            <constraints>
+                                                <constraint firstAttribute="bottom" secondItem="Yyk-2v-65v" secondAttribute="bottom" constant="4" id="GqU-F3-5lo"/>
+                                                <constraint firstItem="Yyk-2v-65v" firstAttribute="bottom" secondItem="IoN-Jo-hdX" secondAttribute="bottom" constant="8" id="KYN-RK-5MW"/>
+                                                <constraint firstItem="IoN-Jo-hdX" firstAttribute="leading" secondItem="Yyk-2v-65v" secondAttribute="leading" constant="8" id="NsX-aJ-Osz"/>
+                                                <constraint firstItem="Yyk-2v-65v" firstAttribute="trailing" secondItem="IoN-Jo-hdX" secondAttribute="trailing" constant="8" id="Rga-Jv-l3h"/>
+                                                <constraint firstItem="Yyk-2v-65v" firstAttribute="trailing" secondItem="eci-xt-EjU" secondAttribute="trailing" id="VoI-4e-sb3"/>
+                                                <constraint firstItem="Yyk-2v-65v" firstAttribute="leading" secondItem="LH8-Ig-syW" secondAttribute="leading" constant="16" id="YPg-QN-O4g"/>
+                                                <constraint firstItem="eci-xt-EjU" firstAttribute="top" secondItem="LH8-Ig-syW" secondAttribute="top" id="dVt-d0-IWv"/>
+                                                <constraint firstItem="Yyk-2v-65v" firstAttribute="top" secondItem="LH8-Ig-syW" secondAttribute="top" constant="4" id="rDf-wf-hvt"/>
+                                                <constraint firstAttribute="trailing" secondItem="Yyk-2v-65v" secondAttribute="trailing" constant="16" id="toc-J4-CPQ"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                        <color key="backgroundColor" name="YP Background"/>
+                                        <connections>
+                                            <outlet property="cellImage" destination="Yyk-2v-65v" id="ZlE-50-v0n"/>
+                                            <outlet property="dateLabel" destination="IoN-Jo-hdX" id="BdX-f7-xdd"/>
+                                            <outlet property="imageView" destination="Yyk-2v-65v" id="EiZ-d2-pcw"/>
+                                            <outlet property="likeButton" destination="eci-xt-EjU" id="c0q-iQ-Woz"/>
+                                        </connections>
+                                    </tableViewCell>
+                                </prototypes>
+                                <connections>
+                                    <outlet property="dataSource" destination="BYZ-38-t0r" id="WjJ-rR-0yM"/>
+                                    <outlet property="delegate" destination="BYZ-38-t0r" id="fba-19-7jJ"/>
+                                </connections>
+                            </tableView>
+                        </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
+                        <color key="backgroundColor" name="YP Background"/>
+                        <constraints>
+                            <constraint firstItem="wYG-Ow-KWR" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" constant="59" id="JjM-JL-cbS"/>
+                            <constraint firstAttribute="trailing" secondItem="wYG-Ow-KWR" secondAttribute="trailing" id="RAg-Ia-LnI"/>
+                            <constraint firstItem="wYG-Ow-KWR" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" constant="1" id="VVJ-75-oLn"/>
+                            <constraint firstItem="wYG-Ow-KWR" firstAttribute="bottom" secondItem="8bC-Xf-vdC" secondAttribute="bottom" id="bwA-nz-i9j"/>
+                        </constraints>
                     </view>
+                    <connections>
+                        <outlet property="tableView" destination="wYG-Ow-KWR" id="UT8-96-y7u"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
+            <point key="canvasLocation" x="130.53435114503816" y="-34.507042253521128"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="0" width="1600" height="1059"/>
+        <image name="No Active" width="30" height="26"/>
+        <namedColor name="YP Background">
+            <color red="0.10196078431372549" green="0.10588235294117647" blue="0.13333333333333333" alpha="0.5" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="YP White">
+            <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+    </resources>
 </document>

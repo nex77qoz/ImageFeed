@@ -17,50 +17,56 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="wYG-Ow-KWR">
-                                <rect key="frame" x="16" y="59" width="361" height="759"/>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" estimatedSectionHeaderHeight="-1" sectionFooterHeight="28" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="wYG-Ow-KWR">
+                                <rect key="frame" x="1" y="59" width="392" height="793"/>
                                 <color key="backgroundColor" name="YP Background"/>
                                 <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="ImagesListCell" rowHeight="330" id="RRA-NL-hTi" customClass="ImagesListCell" customModule="ImageFeed" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="50" width="361" height="330"/>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationWidth="10" reuseIdentifier="ImagesListCell" rowHeight="224" id="RRA-NL-hTi" customClass="ImagesListCell" customModule="ImageFeed" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="50" width="392" height="224"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="RRA-NL-hTi" id="LH8-Ig-syW">
-                                            <rect key="frame" x="0.0" y="0.0" width="361" height="330"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="392" height="224"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="0" translatesAutoresizingMaskIntoConstraints="NO" id="Yyk-2v-65v" userLabel="Cell image">
-                                                    <rect key="frame" x="0.0" y="0.0" width="361" height="330"/>
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" image="0" translatesAutoresizingMaskIntoConstraints="NO" id="Yyk-2v-65v" userLabel="Cell image">
+                                                    <rect key="frame" x="0.0" y="0.0" width="382" height="216"/>
+                                                    <userDefinedRuntimeAttributes>
+                                                        <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                                            <integer key="value" value="16"/>
+                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="layer.masksToBounds" value="YES"/>
+                                                    </userDefinedRuntimeAttributes>
                                                 </imageView>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eci-xt-EjU">
-                                                    <rect key="frame" x="320.66666666666669" y="12" width="30" height="26"/>
+                                                    <rect key="frame" x="332" y="0.0" width="44" height="44"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" constant="44" id="Tln-AI-1zl"/>
+                                                        <constraint firstAttribute="height" constant="44" id="jwA-kd-4F0"/>
+                                                    </constraints>
                                                     <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                                     <state key="normal" image="No Active"/>
                                                 </button>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="22 августа 2022" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IoN-Jo-hdX">
-                                                    <rect key="frame" x="12" y="302.33333333333331" width="102" height="15.666666666666686"/>
+                                                    <rect key="frame" x="24" y="196.33333333333334" width="344" height="15.666666666666657"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="13"/>
                                                     <color key="textColor" name="YP White"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                             </subviews>
+                                            <color key="backgroundColor" name="YP Background"/>
                                             <constraints>
-                                                <constraint firstAttribute="bottom" secondItem="Yyk-2v-65v" secondAttribute="bottom" id="GqU-F3-5lo"/>
-                                                <constraint firstAttribute="bottom" secondItem="IoN-Jo-hdX" secondAttribute="bottom" constant="12" id="KYN-RK-5MW"/>
-                                                <constraint firstItem="IoN-Jo-hdX" firstAttribute="leading" secondItem="LH8-Ig-syW" secondAttribute="leading" constant="12" id="NsX-aJ-Osz"/>
-                                                <constraint firstItem="eci-xt-EjU" firstAttribute="top" secondItem="LH8-Ig-syW" secondAttribute="top" constant="12" id="O2e-vN-3Up"/>
-                                                <constraint firstAttribute="trailing" secondItem="eci-xt-EjU" secondAttribute="trailing" constant="10.5" id="Re2-BA-0eF"/>
-                                                <constraint firstItem="Yyk-2v-65v" firstAttribute="leading" secondItem="LH8-Ig-syW" secondAttribute="leading" id="YPg-QN-O4g"/>
-                                                <constraint firstItem="Yyk-2v-65v" firstAttribute="top" secondItem="LH8-Ig-syW" secondAttribute="top" id="rDf-wf-hvt"/>
-                                                <constraint firstAttribute="trailing" secondItem="Yyk-2v-65v" secondAttribute="trailing" id="toc-J4-CPQ"/>
+                                                <constraint firstAttribute="bottom" secondItem="Yyk-2v-65v" secondAttribute="bottom" constant="4" id="GqU-F3-5lo"/>
+                                                <constraint firstItem="Yyk-2v-65v" firstAttribute="bottom" secondItem="IoN-Jo-hdX" secondAttribute="bottom" constant="8" id="KYN-RK-5MW"/>
+                                                <constraint firstItem="IoN-Jo-hdX" firstAttribute="leading" secondItem="Yyk-2v-65v" secondAttribute="leading" constant="8" id="NsX-aJ-Osz"/>
+                                                <constraint firstItem="Yyk-2v-65v" firstAttribute="trailing" secondItem="IoN-Jo-hdX" secondAttribute="trailing" constant="8" id="Rga-Jv-l3h"/>
+                                                <constraint firstItem="Yyk-2v-65v" firstAttribute="trailing" secondItem="eci-xt-EjU" secondAttribute="trailing" id="VoI-4e-sb3"/>
+                                                <constraint firstItem="Yyk-2v-65v" firstAttribute="leading" secondItem="LH8-Ig-syW" secondAttribute="leading" constant="16" id="YPg-QN-O4g"/>
+                                                <constraint firstItem="eci-xt-EjU" firstAttribute="top" secondItem="LH8-Ig-syW" secondAttribute="top" id="dVt-d0-IWv"/>
+                                                <constraint firstItem="Yyk-2v-65v" firstAttribute="top" secondItem="LH8-Ig-syW" secondAttribute="top" constant="4" id="rDf-wf-hvt"/>
+                                                <constraint firstAttribute="trailing" secondItem="Yyk-2v-65v" secondAttribute="trailing" constant="16" id="toc-J4-CPQ"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                         <color key="backgroundColor" name="YP Background"/>
-                                        <userDefinedRuntimeAttributes>
-                                            <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
-                                                <integer key="value" value="16"/>
-                                            </userDefinedRuntimeAttribute>
-                                            <userDefinedRuntimeAttribute type="boolean" keyPath="layer.masksToBounds" value="YES"/>
-                                        </userDefinedRuntimeAttributes>
                                         <connections>
                                             <outlet property="cellImage" destination="Yyk-2v-65v" id="ZlE-50-v0n"/>
                                             <outlet property="dateLabel" destination="IoN-Jo-hdX" id="BdX-f7-xdd"/>
@@ -78,10 +84,10 @@
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" name="YP Background"/>
                         <constraints>
-                            <constraint firstItem="wYG-Ow-KWR" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="dQO-2U-kVT"/>
-                            <constraint firstAttribute="trailingMargin" secondItem="wYG-Ow-KWR" secondAttribute="trailing" id="kC8-GV-8MS"/>
-                            <constraint firstAttribute="bottomMargin" secondItem="wYG-Ow-KWR" secondAttribute="bottom" id="kIF-L6-xWZ"/>
-                            <constraint firstItem="wYG-Ow-KWR" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="topMargin" id="tVR-Ce-gKM"/>
+                            <constraint firstItem="wYG-Ow-KWR" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" constant="59" id="JjM-JL-cbS"/>
+                            <constraint firstAttribute="trailing" secondItem="wYG-Ow-KWR" secondAttribute="trailing" id="RAg-Ia-LnI"/>
+                            <constraint firstItem="wYG-Ow-KWR" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" constant="1" id="VVJ-75-oLn"/>
+                            <constraint firstItem="wYG-Ow-KWR" firstAttribute="bottom" secondItem="8bC-Xf-vdC" secondAttribute="bottom" id="bwA-nz-i9j"/>
                         </constraints>
                     </view>
                     <connections>

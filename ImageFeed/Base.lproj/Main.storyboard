@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23094" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="MLd-I9-iNv">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23094" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Bpu-gU-ujJ">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
@@ -169,15 +169,19 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ghq-lo-4ch">
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ghq-lo-4ch">
                                 <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <subviews>
-                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="0" translatesAutoresizingMaskIntoConstraints="NO" id="LmI-R3-JK0">
-                                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="0" translatesAutoresizingMaskIntoConstraints="NO" id="LmI-R3-JK0">
+                                        <rect key="frame" x="0.0" y="0.0" width="1600" height="1059"/>
                                     </imageView>
                                 </subviews>
+                                <constraints>
+                                    <constraint firstItem="LmI-R3-JK0" firstAttribute="top" secondItem="ghq-lo-4ch" secondAttribute="top" id="1uD-Q5-Ekz"/>
+                                    <constraint firstAttribute="trailing" secondItem="LmI-R3-JK0" secondAttribute="trailing" id="6iu-7U-2MA"/>
+                                    <constraint firstItem="LmI-R3-JK0" firstAttribute="leading" secondItem="ghq-lo-4ch" secondAttribute="leading" id="AIM-h0-Z6h"/>
+                                    <constraint firstAttribute="bottom" secondItem="LmI-R3-JK0" secondAttribute="bottom" id="Ur6-bc-EIv"/>
+                                </constraints>
                                 <viewLayoutGuide key="contentLayoutGuide" id="J0h-6b-S0x"/>
                                 <viewLayoutGuide key="frameLayoutGuide" id="wtl-Qi-trj"/>
                                 <connections>
@@ -213,7 +217,11 @@
                             <constraint firstItem="XXi-wC-5cl" firstAttribute="top" secondItem="tce-5a-ZpT" secondAttribute="top" constant="84" id="27y-rv-ZER"/>
                             <constraint firstItem="7Ru-TF-vE9" firstAttribute="leading" secondItem="tce-5a-ZpT" secondAttribute="leading" id="IDh-7Y-sUZ"/>
                             <constraint firstItem="XXi-wC-5cl" firstAttribute="leading" secondItem="tce-5a-ZpT" secondAttribute="leading" constant="14" id="PPC-pD-ijr"/>
+                            <constraint firstItem="ghq-lo-4ch" firstAttribute="top" secondItem="tce-5a-ZpT" secondAttribute="top" id="RAC-WO-eUc"/>
+                            <constraint firstAttribute="bottom" secondItem="ghq-lo-4ch" secondAttribute="bottom" id="e9p-eN-Pxs"/>
+                            <constraint firstAttribute="trailing" secondItem="ghq-lo-4ch" secondAttribute="trailing" id="lDF-7O-Mh2"/>
                             <constraint firstItem="jvh-cO-5Ji" firstAttribute="trailing" secondItem="7Ru-TF-vE9" secondAttribute="trailing" id="m3a-EQ-bfv"/>
+                            <constraint firstItem="ghq-lo-4ch" firstAttribute="leading" secondItem="tce-5a-ZpT" secondAttribute="leading" id="u4c-pk-q2c"/>
                             <constraint firstAttribute="bottom" secondItem="7Ru-TF-vE9" secondAttribute="bottom" constant="17" id="zKj-mM-nnf"/>
                         </constraints>
                     </view>

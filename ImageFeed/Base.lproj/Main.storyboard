@@ -189,7 +189,7 @@
                                 </connections>
                             </scrollView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7Ru-TF-vE9" userLabel="ShareButton">
-                                <rect key="frame" x="0.0" y="770" width="393" height="65"/>
+                                <rect key="frame" x="0.0" y="736" width="393" height="65"/>
                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                 <state key="normal" image="Sharing"/>
                                 <buttonConfiguration key="configuration" style="plain" image="Sharing"/>
@@ -222,7 +222,7 @@
                             <constraint firstAttribute="trailing" secondItem="ghq-lo-4ch" secondAttribute="trailing" id="lDF-7O-Mh2"/>
                             <constraint firstItem="jvh-cO-5Ji" firstAttribute="trailing" secondItem="7Ru-TF-vE9" secondAttribute="trailing" id="m3a-EQ-bfv"/>
                             <constraint firstItem="ghq-lo-4ch" firstAttribute="leading" secondItem="tce-5a-ZpT" secondAttribute="leading" id="u4c-pk-q2c"/>
-                            <constraint firstAttribute="bottom" secondItem="7Ru-TF-vE9" secondAttribute="bottom" constant="17" id="zKj-mM-nnf"/>
+                            <constraint firstAttribute="bottom" secondItem="7Ru-TF-vE9" secondAttribute="bottom" constant="51" id="zKj-mM-nnf"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="cuH-7S-V09"/>

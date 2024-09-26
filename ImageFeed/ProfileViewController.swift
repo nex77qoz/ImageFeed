@@ -7,7 +7,7 @@
 
 import UIKit
 
-class ProfileViewController: UIViewController {
+final class ProfileViewController: UIViewController {
     private let imageView = UIImageView()
     private let nameLabel = UILabel()
     private let nicknameLabel = UILabel()
@@ -23,7 +23,8 @@ class ProfileViewController: UIViewController {
         showExitButton()
         
     }
-    func showProfileImage() {
+    
+    private func showProfileImage() {
         let profileImage = UIImage(named: "profileImage")
         imageView.image = profileImage
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -36,7 +37,8 @@ class ProfileViewController: UIViewController {
             imageView.heightAnchor.constraint(equalToConstant: 70)
         ])
     }
-    func showName() {
+    
+    private func showName() {
         nameLabel.text = "Екатерина Новикова"
         nameLabel.textColor = .ypWhite
         nameLabel.font = .systemFont(ofSize: 18, weight: .bold)
@@ -49,7 +51,8 @@ class ProfileViewController: UIViewController {
             nameLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -24)
         ])
     }
-    func showNicknameLabel() {
+    
+    private func showNicknameLabel() {
         nicknameLabel.text = "@ekaterina_nov"
         nicknameLabel.textColor = .ypGray
         nicknameLabel.font = .systemFont(ofSize: 13, weight: .regular)
@@ -62,7 +65,8 @@ class ProfileViewController: UIViewController {
             nicknameLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -24)
         ])
     }
-    func showProfileDescription() {
+    
+    private func showProfileDescription() {
         profileDescription.text = "Hello, World!"
         profileDescription.textColor = .ypWhite
         profileDescription.font = .systemFont(ofSize: 13, weight: .regular)
@@ -75,7 +79,8 @@ class ProfileViewController: UIViewController {
             profileDescription.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -24)
             ])
     }
-    func showExitButton() {
+    
+    private func showExitButton() {
         let button = UIButton.systemButton(with: UIImage(named: "Exit")!, target: self, action: #selector(Self.didTapExitButton))
         button.tintColor = .ypRed
         view.addSubview(button)
@@ -88,8 +93,9 @@ class ProfileViewController: UIViewController {
             button.centerYAnchor.constraint(equalTo: imageView.centerYAnchor)
             ])
     }
+    
     @objc
-    func didTapExitButton() {
+    private func didTapExitButton() {
         print("Exit button tapped")
     }
     

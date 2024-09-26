@@ -56,6 +56,7 @@ final class SingleImageViewController: UIViewController {
         scrollView.layoutIfNeeded()
         centerImage()
     }
+    
     private func centerImage() {
         let scrollViewSize = scrollView.bounds.size
         let imageSize = imageView.frame.size
@@ -70,6 +71,7 @@ extension SingleImageViewController: UIScrollViewDelegate {
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
         imageView
     }
+    
     func scrollViewDidZoom(_ scrollView: UIScrollView) {
         centerImage()
     }

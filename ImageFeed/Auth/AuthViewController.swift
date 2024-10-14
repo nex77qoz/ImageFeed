@@ -6,11 +6,20 @@
 //
 import UIKit
 
+protocol AuthViewControllerDelegate: AnyObject {
+    func authViewController(_ vc: AuthViewController, didAuthenticateWithCode code: String)
+}
+
 final class AuthViewController: UIViewController {
+    private let ShowWebViewSegueIdentifier = "ShowWebView"
+    
+    weak var delegate: AuthViewControllerDelegate?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         configureBackButton()
     }
+    private let oauth2Service = OAuth2Service.shared
     
     func configureBackButton() {
         navigationController?.navigationBar.backIndicatorImage = UIImage(named: "Backward")
@@ -26,15 +35,13 @@ final class AuthViewController: UIViewController {
             } else {
                 super.prepare(for: segue, sender: sender)
             }
-            
         }
     }
-    
 }
 
 extension AuthViewController: WebViewViewControllerDelegate {
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
-        //TODO: process code
+        delegate?.authViewController(self, didAuthenticateWithCode: code)
     }
     
     func webViewViewControllerDidCancel(_ vc: WebViewViewController) {

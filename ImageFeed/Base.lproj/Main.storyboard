@@ -190,13 +190,13 @@
                             </imageView>
                             <button contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="V5o-FJ-kRj">
                                 <rect key="frame" x="16" y="704" width="361" height="48"/>
+                                <color key="backgroundColor" name="YP White"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="48" id="K3C-nL-M2P"/>
                                 </constraints>
                                 <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="filled" title="Войти">
+                                <buttonConfiguration key="configuration" style="plain" title="Войти">
                                     <color key="baseForegroundColor" name="YP Black"/>
-                                    <color key="baseBackgroundColor" name="YP White"/>
                                 </buttonConfiguration>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">

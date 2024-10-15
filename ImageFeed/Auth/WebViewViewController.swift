@@ -22,7 +22,7 @@ final class WebViewViewController: UIViewController{
     override func viewDidLoad() {
         super.viewDidLoad()
         loadAuthView()
-        webView.navigationDelegate = self 
+        webView.navigationDelegate = self
     }
     
     override func observeValue(
@@ -62,28 +62,32 @@ final class WebViewViewController: UIViewController{
     }
     
     private func loadAuthView() {
-        guard var urlComponents = URLComponents(string: WebViewConstants.UnsplashAuthorizeURLString) else {
-            print("Не получилось создать URLComponents")
+        guard var urlComponents = URLComponents(string: WebViewConstants.unsplashAuthorizeURLString) else {
+            assertionFailure("Не удалось создать URLComponents из строки \(WebViewConstants.unsplashAuthorizeURLString)")
             return
         }
         
         urlComponents.queryItems = [
-            URLQueryItem(name: "client_id", value: Constants.AccessKey),
-            URLQueryItem(name: "redirect_uri", value: Constants.RedirectURI),
+            URLQueryItem(name: "client_id", value: Constants.accessKey),
+            URLQueryItem(name: "redirect_uri", value: Constants.redirectURI),
             URLQueryItem(name: "response_type", value: "code"),
-            URLQueryItem(name: "scope", value: Constants.AccessScope)
+            URLQueryItem(name: "scope", value: Constants.accessScope)
         ]
         
-        guard let url = urlComponents.url else { return }
+        guard let url = urlComponents.url else {
+            assertionFailure("Не удалось получить URL из URLComponents")
+            return
+        }
         
         let request = URLRequest(url: url)
         webView.load(request)
     }
+    private enum WebViewConstants {
+        static let unsplashAuthorizeURLString = "https://unsplash.com/oauth/authorize"
+    }
     
 }
-enum WebViewConstants {
-    static let UnsplashAuthorizeURLString = "https://unsplash.com/oauth/authorize"
-}
+
 extension WebViewViewController: WKNavigationDelegate {
     func webView(
         _ webView: WKWebView,
@@ -107,6 +111,7 @@ extension WebViewViewController: WKNavigationDelegate {
         {
             return codeItem.value
         } else {
+            assertionFailure("Не удалось извлечь код авторизации из URL \(String(describing: navigationAction.request.url))")
             return nil
         }
     }

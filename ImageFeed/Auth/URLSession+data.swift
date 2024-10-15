@@ -23,11 +23,13 @@ extension URLSession {
         let task = dataTask(with: request) { data, response, error in
             DispatchQueue.main.async {
                 if let error = error {
+                    print("Ошибка URLRequest: \(error.localizedDescription)")
                     completion(.failure(NetworkError.urlRequestError(error)))
                     return
                 }
                 
                 guard let response = response as? HTTPURLResponse else {
+                    print("Некорректный формат ответа")
                     completion(.failure(NetworkError.urlSessionError))
                     return
                 }
@@ -36,9 +38,11 @@ extension URLSession {
                     if let data = data {
                         completion(.success(data))
                     } else {
+                        print("Данные отсутствуют")
                         completion(.failure(NetworkError.urlSessionError))
                     }
                 } else {
+                    print("Ошибка сервера. Код ответа \(response.statusCode)")
                     completion(.failure(NetworkError.httpStatusCode(response.statusCode)))
                 }
             }

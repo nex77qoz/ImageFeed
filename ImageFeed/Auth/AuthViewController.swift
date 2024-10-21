@@ -5,10 +5,10 @@
 //  Created by Максим Бабкин on 28.09.2024.
 //
 import UIKit
-
+import ProgressHUD
 
 protocol AuthViewControllerDelegate: AnyObject {
-    func authViewController(_ vc: AuthViewController, didAuthenticateWithCode code: String)
+    func didAuthenticate(_ vc: AuthViewController)
 }
 
 final class AuthViewController: UIViewController {
@@ -30,22 +30,47 @@ final class AuthViewController: UIViewController {
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "ShowWebView" {
-            if let webViewVC = segue.destination as? WebViewViewController {
-                webViewVC.delegate = self
-            } else {
-                super.prepare(for: segue, sender: sender)
+        if segue.identifier == ShowWebViewSegueIdentifier {
+            guard
+                let webViewViewController = segue.destination as? WebViewViewController
+            else {
+                assertionFailure("Failed to prepare for \(ShowWebViewSegueIdentifier)")
+                return
             }
+            webViewViewController.delegate = self
+        } else {
+            super.prepare(for: segue, sender: sender)
         }
     }
 }
 
 extension AuthViewController: WebViewViewControllerDelegate {
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
-        delegate?.authViewController(self, didAuthenticateWithCode: code)
+        vc.dismiss(animated: true)
+        ProgressHUD.animate()
+        fetchOAuthToken(code) { [weak self] result in
+            ProgressHUD.dismiss()
+            guard let self = self else { return }
+            
+            switch result {
+            case .success:
+                self.delegate?.didAuthenticate(self)
+            case .failure:
+                // TODO [Sprint 11] Добавьте обработку ошибки
+                break
+            }
+        }
     }
     
     func webViewViewControllerDidCancel(_ vc: WebViewViewController) {
-        dismiss(animated: true)
+        vc.dismiss(animated: true)
+    }
+}
+
+extension AuthViewController {
+    private func fetchOAuthToken(_ code: String, completion: @escaping (Result<String, Error>) -> Void) {
+        oauth2Service.fetchOAuthToken(code) { result in
+            completion(result)
+        }
     }
 }

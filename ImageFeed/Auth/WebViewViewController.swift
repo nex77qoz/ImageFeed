@@ -8,6 +8,10 @@
 import UIKit
 import WebKit
 
+enum WebViewConstants {
+    static let unsplashAuthorizeURLString = "https://unsplash.com/oauth/authorize"
+}
+
 protocol WebViewViewControllerDelegate: AnyObject {
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String)
     func webViewViewControllerDidCancel(_ vc: WebViewViewController)
@@ -81,11 +85,9 @@ final class WebViewViewController: UIViewController{
         
         let request = URLRequest(url: url)
         webView.load(request)
+
+        updateProgress()
     }
-    private enum WebViewConstants {
-        static let unsplashAuthorizeURLString = "https://unsplash.com/oauth/authorize"
-    }
-    
 }
 
 extension WebViewViewController: WKNavigationDelegate {
@@ -104,9 +106,9 @@ extension WebViewViewController: WKNavigationDelegate {
     private func code(from navigationAction: WKNavigationAction) -> String? {
         if
             let url = navigationAction.request.url,
-            let urlcomponents = URLComponents(string: url.absoluteString),
-            urlcomponents.path == "/oauth/authorize/native",
-            let items = urlcomponents.queryItems,
+            let urlComponents = URLComponents(string: url.absoluteString),
+            urlComponents.path == "/oauth/authorize/native",
+            let items = urlComponents.queryItems,
             let codeItem = items.first(where: { $0.name == "code" })
         {
             return codeItem.value

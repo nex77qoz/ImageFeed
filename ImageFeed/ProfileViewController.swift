@@ -13,7 +13,6 @@ final class ProfileViewController: UIViewController {
     private let nicknameLabel = UILabel()
     private let profileDescription = UILabel()
     
-
     override func viewDidLoad() {
         super.viewDidLoad()
         showProfileImage()
@@ -21,7 +20,7 @@ final class ProfileViewController: UIViewController {
         showNicknameLabel()
         showProfileDescription()
         showExitButton()
-        
+        updateProfileDetails()
     }
     
     private func showProfileImage() {
@@ -39,7 +38,7 @@ final class ProfileViewController: UIViewController {
     }
     
     private func showName() {
-        nameLabel.text = "Екатерина Новикова"
+        nameLabel.text = ""
         nameLabel.textColor = .ypWhite
         nameLabel.font = .systemFont(ofSize: 18, weight: .bold)
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -53,7 +52,7 @@ final class ProfileViewController: UIViewController {
     }
     
     private func showNicknameLabel() {
-        nicknameLabel.text = "@ekaterina_nov"
+        nicknameLabel.text = ""
         nicknameLabel.textColor = .ypGray
         nicknameLabel.font = .systemFont(ofSize: 13, weight: .regular)
         nicknameLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -67,7 +66,7 @@ final class ProfileViewController: UIViewController {
     }
     
     private func showProfileDescription() {
-        profileDescription.text = "Hello, World!"
+        profileDescription.text = ""
         profileDescription.textColor = .ypWhite
         profileDescription.font = .systemFont(ofSize: 13, weight: .regular)
         profileDescription.translatesAutoresizingMaskIntoConstraints = false
@@ -103,5 +102,27 @@ final class ProfileViewController: UIViewController {
         print("Exit button tapped")
     }
     
+    // MARK: - Получение данных профиля
+    
+    private func updateProfileDetails() {
+        guard let token = OAuth2TokenStorage.shared.token else {
+            print("No token available")
+            return
+        }
+        
+        ProfileService.shared.fetchProfile(token) { [weak self] result in
+            switch result {
+            case .success(let profile):
+                self?.updateUI(with: profile)
+            case .failure(let error):
+                print("Error fetching profile: \(error)")
+            }
+        }
+    }
+    
+    private func updateUI(with profile: Profile) {
+        nameLabel.text = profile.name
+        nicknameLabel.text = profile.loginName
+        profileDescription.text = profile.bio
+    }
 }
-

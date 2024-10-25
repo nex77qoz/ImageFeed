@@ -17,6 +17,7 @@
 		7572C8E32CA5D18E00000CC4 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7572C8E22CA5D18500000CC4 /* Constants.swift */; };
 		7572C8E52CA86B5700000CC4 /* AuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7572C8E42CA86B5300000CC4 /* AuthViewController.swift */; };
 		7572C8EA2CA86F2F00000CC4 /* WebViewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7572C8E92CA86F2B00000CC4 /* WebViewViewController.swift */; };
+		7579CD182CCADF2E00748B51 /* ProfileImageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7579CD172CCADF2600748B51 /* ProfileImageService.swift */; };
 		759F3A602CA98FEA000B1F88 /* OAuth2Service.swift in Sources */ = {isa = PBXBuildFile; fileRef = 759F3A5F2CA98FE7000B1F88 /* OAuth2Service.swift */; };
 		759F3A622CAC71B9000B1F88 /* URLSession+data.swift in Sources */ = {isa = PBXBuildFile; fileRef = 759F3A612CAC71AD000B1F88 /* URLSession+data.swift */; };
 		759F3A642CAC741D000B1F88 /* OAuthTokenResponseBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = 759F3A632CAC741C000B1F88 /* OAuthTokenResponseBody.swift */; };
@@ -24,6 +25,8 @@
 		759F3A6A2CAC7CEC000B1F88 /* SplashViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 759F3A692CAC7CEC000B1F88 /* SplashViewController.swift */; };
 		75C0A6322CC6D4D900CE2247 /* ProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = 75C0A6312CC6D4D900CE2247 /* ProgressHUD */; };
 		75D7FCBF2C8D95F500DAE973 /* SingleImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D7FCBE2C8D95F500DAE973 /* SingleImageViewController.swift */; };
+		75E9CAEB2CCACB95003B47D1 /* UIBlockingProgressHUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75E9CAEA2CCACB86003B47D1 /* UIBlockingProgressHUD.swift */; };
+		75E9CAED2CCACD82003B47D1 /* ProfileService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75E9CAEC2CCACD80003B47D1 /* ProfileService.swift */; };
 		75F355162C8D83AD00058F71 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75F355152C8D83AD00058F71 /* ProfileViewController.swift */; };
 /* End PBXBuildFile section */
 
@@ -40,12 +43,15 @@
 		7572C8E22CA5D18500000CC4 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		7572C8E42CA86B5300000CC4 /* AuthViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewController.swift; sourceTree = "<group>"; };
 		7572C8E92CA86F2B00000CC4 /* WebViewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewViewController.swift; sourceTree = "<group>"; };
+		7579CD172CCADF2600748B51 /* ProfileImageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileImageService.swift; sourceTree = "<group>"; };
 		759F3A5F2CA98FE7000B1F88 /* OAuth2Service.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OAuth2Service.swift; sourceTree = "<group>"; };
 		759F3A612CAC71AD000B1F88 /* URLSession+data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URLSession+data.swift"; sourceTree = "<group>"; };
 		759F3A632CAC741C000B1F88 /* OAuthTokenResponseBody.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OAuthTokenResponseBody.swift; sourceTree = "<group>"; };
 		759F3A652CAC7472000B1F88 /* OAuth2TokenStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OAuth2TokenStorage.swift; sourceTree = "<group>"; };
 		759F3A692CAC7CEC000B1F88 /* SplashViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashViewController.swift; sourceTree = "<group>"; };
 		75D7FCBE2C8D95F500DAE973 /* SingleImageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleImageViewController.swift; sourceTree = "<group>"; };
+		75E9CAEA2CCACB86003B47D1 /* UIBlockingProgressHUD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIBlockingProgressHUD.swift; sourceTree = "<group>"; };
+		75E9CAEC2CCACD80003B47D1 /* ProfileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileService.swift; sourceTree = "<group>"; };
 		75F355152C8D83AD00058F71 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -89,6 +95,9 @@
 		753A4C652C88E1DD004FD659 /* ImageFeed */ = {
 			isa = PBXGroup;
 			children = (
+				7579CD172CCADF2600748B51 /* ProfileImageService.swift */,
+				75E9CAEC2CCACD80003B47D1 /* ProfileService.swift */,
+				75E9CAEA2CCACB86003B47D1 /* UIBlockingProgressHUD.swift */,
 				7572C8E62CA86EF200000CC4 /* Auth */,
 				7572C8E22CA5D18500000CC4 /* Constants.swift */,
 				759F3A692CAC7CEC000B1F88 /* SplashViewController.swift */,
@@ -193,13 +202,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				753A4C6B2C88E1DD004FD659 /* ImagesListViewController.swift in Sources */,
+				75E9CAED2CCACD82003B47D1 /* ProfileService.swift in Sources */,
 				3D714D592C8C4F81001CB89F /* ImagesListCell.swift in Sources */,
 				759F3A642CAC741D000B1F88 /* OAuthTokenResponseBody.swift in Sources */,
 				75F355162C8D83AD00058F71 /* ProfileViewController.swift in Sources */,
 				753A4C672C88E1DD004FD659 /* AppDelegate.swift in Sources */,
+				7579CD182CCADF2E00748B51 /* ProfileImageService.swift in Sources */,
 				759F3A6A2CAC7CEC000B1F88 /* SplashViewController.swift in Sources */,
 				7572C8E52CA86B5700000CC4 /* AuthViewController.swift in Sources */,
 				7572C8E32CA5D18E00000CC4 /* Constants.swift in Sources */,
+				75E9CAEB2CCACB95003B47D1 /* UIBlockingProgressHUD.swift in Sources */,
 				75D7FCBF2C8D95F500DAE973 /* SingleImageViewController.swift in Sources */,
 				759F3A622CAC71B9000B1F88 /* URLSession+data.swift in Sources */,
 				7572C8EA2CA86F2F00000CC4 /* WebViewViewController.swift in Sources */,

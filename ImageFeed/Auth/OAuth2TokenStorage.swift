@@ -14,6 +14,8 @@ final class OAuth2TokenStorage {
         case bearerToken
     }
     
+    private init() {}
+    
     var token: String? {
         get {
             UserDefaults.standard.string(forKey: Keys.bearerToken.rawValue)

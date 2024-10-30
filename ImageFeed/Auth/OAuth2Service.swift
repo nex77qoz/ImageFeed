@@ -5,7 +5,6 @@
 //  Created by Максим Бабкин on 29.09.2024.
 //
 import UIKit
-import WebKit
 
 enum AuthServiceError: Error {
     case invalidRequest
@@ -14,22 +13,19 @@ enum AuthServiceError: Error {
 final class OAuth2Service {
     static let shared = OAuth2Service()
 
-    private let dataStorage = OAuth2TokenStorage()
+    private let dataStorage = OAuth2TokenStorage.shared
     private let urlSession = URLSession.shared
     
-    // Добавляем новые свойства для отслеживания задач
     private var task: URLSessionTask?
     private var lastCode: String?
-    
     
     private init() { }
     
     func fetchOAuthToken(_ code: String, completion: @escaping (Result<String, Error>) -> Void) {
-        // Проверяем, что мы на главном потоке
         assert(Thread.isMainThread)
         
-        // Логика обработки повторных запросов
         guard lastCode != code else {
+            print("[OAuth2Service fetchOAuthToken]: Ошибка - состояние гонки!")
             completion(.failure(AuthServiceError.invalidRequest))
             return
         }
@@ -38,23 +34,24 @@ final class OAuth2Service {
         lastCode = code
         
         guard let request = makeOAuthTokenRequest(code: code) else {
+            print("[OAuth2Service fetchOAuthToken]: Ошибка - неправильный запрос")
             completion(.failure(AuthServiceError.invalidRequest))
             return
         }
         
-        let task = object(for: request) { [weak self] result in
+        let task = urlSession.objectTask(for: request) { [weak self] (result: Result<OAuthTokenResponseBody, Error>) in
             DispatchQueue.main.async {
                 guard let self = self else { return }
                 
-                // Очищаем состояние задачи
                 self.task = nil
                 self.lastCode = nil
                 
                 switch result {
                 case .success(let body):
-                    let authToken = body.accessToken
-                    completion(.success(authToken))
+                        OAuth2TokenStorage.shared.token = body.accessToken
+                        completion(.success(body.accessToken))
                 case .failure(let error):
+                    print("[OAuth2Service fetchOAuthToken]: Ошибка - \(error.localizedDescription)")
                     completion(.failure(error))
                 }
             }
@@ -91,29 +88,6 @@ final class OAuth2Service {
         
         enum CodingKeys: String, CodingKey {
             case accessToken = "access_token"
-        }
-    }
-}
-
-// MARK: - Network Client
-extension OAuth2Service {
-    private func object(for request: URLRequest, completion: @escaping (Result<OAuthTokenResponseBody, Error>) -> Void) -> URLSessionTask {
-        let decoder = JSONDecoder()
-        return urlSession.data(for: request) { (result: Result<Data, Error>) in
-            switch result {
-            case .success(let data):
-                do {
-                    let decoder = JSONDecoder()
-                    let token = try decoder.decode(OAuthTokenResponseBody.self, from: data)
-                    completion(.success(token))
-                } catch {
-                    print("Ошибка декодирования: \(error)")
-                    completion(.failure(error))
-                }
-            case .failure(let error):
-                print("Сетевая ошибка: \(error)")
-                completion(.failure(error))
-            }
         }
     }
 }

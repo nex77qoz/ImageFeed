@@ -7,11 +7,10 @@
 
 
 import Foundation
-import UIKit
-import WebKit
 
 final class ProfileImageService {
     static let shared = ProfileImageService()
+    static let didChangeNotification = Notification.Name(rawValue: "ProfileImageProviderDidChange")
     private init() {}
     
     private let urlSession = URLSession.shared
@@ -29,31 +28,29 @@ final class ProfileImageService {
         lastUsername = username
         
         guard let request = makeRequest(username: username) else {
+            print("[ProfileImageService fetchProfileImageURL]: Ошибка - неправильный запрос")
             completion(.failure(AuthServiceError.invalidRequest))
             return
         }
         
-        let task = urlSession.dataTask(with: request) { [weak self] data, response, error in
+        let task = urlSession.objectTask(for: request) { [weak self] (result: Result<UserResult, Error>) in
             DispatchQueue.main.async {
                 guard let self = self else { return }
                 self.task = nil
                 self.lastUsername = nil
                 
-                if let error = error {
-                    completion(.failure(error))
-                    return
-                }
-                guard let data = data else {
-                    completion(.failure(NetworkError.noData))
-                    return
-                }
-                do {
-                    let decoder = JSONDecoder()
-                    let userResult = try decoder.decode(UserResult.self, from: data)
+                switch result {
+                case .success(let userResult):
                     let avatarURL = userResult.profileImage.small
                     self.avatarURL = avatarURL
                     completion(.success(avatarURL))
-                } catch {
+                    NotificationCenter.default.post(
+                        name: ProfileImageService.didChangeNotification,
+                        object: self,
+                        userInfo: ["URL": avatarURL]
+                    )
+                case .failure(let error):
+                    print("[ProfileImageService fetchProfileImageURL]: Ошибка - \(error.localizedDescription)")
                     completion(.failure(error))
                 }
             }
@@ -80,9 +77,13 @@ final class ProfileImageService {
 struct UserResult: Codable {
     let profileImage: ProfileImage
     
+    enum CodingKeys: String, CodingKey {
+        case profileImage = "profile_image"
+    }
+    
     struct ProfileImage: Codable {
         let small: String
         let medium: String
         let large: String
-    }
+        }
 }

@@ -6,12 +6,14 @@
 //
 
 import UIKit
+import Kingfisher
 
 final class ProfileViewController: UIViewController {
     private let imageView = UIImageView()
     private let nameLabel = UILabel()
     private let nicknameLabel = UILabel()
     private let profileDescription = UILabel()
+    private var profileImageServiceObserver: NSObjectProtocol?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,11 +23,25 @@ final class ProfileViewController: UIViewController {
         showProfileDescription()
         showExitButton()
         updateProfileDetails()
+        
+        profileImageServiceObserver = NotificationCenter.default.addObserver(
+            forName: ProfileImageService.didChangeNotification, object: nil, queue: .main) { [weak self] _ in
+                guard let self = self else { return }
+                self.updateAvatar()
+            }
+    }
+    private func updateAvatar() {
+        guard
+            let avatarURL = ProfileImageService.shared.avatarURL,
+            let url = URL(string: avatarURL)
+                else { return }
+        imageView.kf.setImage(with: url)
     }
     
     private func showProfileImage() {
-        let profileImage = UIImage(named: "profileImage")
-        imageView.image = profileImage
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        imageView.layer.cornerRadius = 35
         imageView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(imageView)
         
@@ -99,14 +115,14 @@ final class ProfileViewController: UIViewController {
     
     @objc
     private func didTapExitButton() {
-        print("Exit button tapped")
+        print("Нажата кнопка выхода")
     }
     
     // MARK: - Получение данных профиля
     
     private func updateProfileDetails() {
         guard let token = OAuth2TokenStorage.shared.token else {
-            print("No token available")
+            print("Токен недоступен")
             return
         }
         
@@ -115,7 +131,7 @@ final class ProfileViewController: UIViewController {
             case .success(let profile):
                 self?.updateUI(with: profile)
             case .failure(let error):
-                print("Error fetching profile: \(error)")
+                print("Ошибка получения профиля: \(error)")
             }
         }
     }
@@ -124,5 +140,6 @@ final class ProfileViewController: UIViewController {
         nameLabel.text = profile.name
         nicknameLabel.text = profile.loginName
         profileDescription.text = profile.bio
+        updateAvatar()
     }
 }

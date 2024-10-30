@@ -1,53 +1,46 @@
+//
+//  ProfileService.swift
+//  ImageFeed
+//
+//  Created by Максим Бабкин on 24.10.2024.
+//
 import Foundation
 
 final class ProfileService {
     static let shared = ProfileService()
-    
     private let urlSession = URLSession.shared
     private var task: URLSessionTask?
+    private var profile: Profile?
     
-    private (set) var profile: Profile?
-    
+    private init() {}
+
     func fetchProfile(_ token: String, completion: @escaping (Result<Profile, Error>) -> Void) {
         assert(Thread.isMainThread)
-        
         task?.cancel()
         
         guard let request = makeProfileRequest(token: token) else {
-            print("Некорректный запрос профиля")
+            print("[ProfileService fetchProfile]: Ошибка - неправильный запрос")
             completion(.failure(AuthServiceError.invalidRequest))
             return
         }
         
-        let task = urlSession.dataTask(with: request) { [weak self] data, response, error in
+        let task = urlSession.objectTask(for: request) { [weak self] (result: Result<ProfileResult, Error>) in
             DispatchQueue.main.async {
-                self?.task = nil
+                guard let self = self else { return }
+                self.task = nil
                 
-                if let error = error {
-                    print("Ошибка при запросе профиля: \(error)")
-                    completion(.failure(error))
-                    return
-                }
-                
-                guard let data = data else {
-                    print("Нет данных в ответе")
-                    completion(.failure(NSError(domain: "ProfileService", code: -1, userInfo: nil)))
-                    return
-                }
-                
-                do {
-                    let decoder = JSONDecoder()
-                    decoder.keyDecodingStrategy = .convertFromSnakeCase
-                    let profileResult = try decoder.decode(ProfileResult.self, from: data)
+                switch result {
+                case .success(let profileResult):
                     let profile = Profile(profileResult: profileResult)
-                    self?.profile = profile
+                    self.profile = profile
                     completion(.success(profile))
-                } catch {
-                    print("Ошибка декодирования профиля: \(error)")
+                case .failure(let error):
+                    print("[ProfileService fetchProfile]: Ошибка - \(error.localizedDescription)")
                     completion(.failure(error))
                 }
             }
         }
+        
         self.task = task
         task.resume()
     }
@@ -64,13 +57,20 @@ final class ProfileService {
     }
 }
 
-// MARK: - Модели
+// MARK: - Models
 
 struct ProfileResult: Codable {
     let username: String
     let firstName: String
     let lastName: String?
     let bio: String?
+    
+    enum CodingKeys: String, CodingKey {
+        case username
+        case firstName = "first_name"
+        case lastName = "last_name"
+        case bio
+    }
 }
 
 struct Profile {

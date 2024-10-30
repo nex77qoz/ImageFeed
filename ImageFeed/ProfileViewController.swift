@@ -23,6 +23,7 @@ final class ProfileViewController: UIViewController {
         showProfileDescription()
         showExitButton()
         updateProfileDetails()
+        view.backgroundColor = .ypBlack
         
         profileImageServiceObserver = NotificationCenter.default.addObserver(
             forName: ProfileImageService.didChangeNotification, object: nil, queue: .main) { [weak self] _ in

@@ -14,6 +14,7 @@ final class ProfileViewController: UIViewController {
     private let nicknameLabel = UILabel()
     private let profileDescription = UILabel()
     private var profileImageServiceObserver: NSObjectProtocol?
+    private let oauth2TokenStorage = OAuth2TokenStorage.shared
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -38,7 +39,7 @@ final class ProfileViewController: UIViewController {
                 else { return }
         imageView.kf.setImage(with: url)
     }
-    
+    // MARK: - Рисуем интерфейс
     private func showProfileImage() {
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
@@ -117,6 +118,7 @@ final class ProfileViewController: UIViewController {
     @objc
     private func didTapExitButton() {
         print("Нажата кнопка выхода")
+        oauth2TokenStorage.token = nil
     }
     
     // MARK: - Получение данных профиля
@@ -132,7 +134,7 @@ final class ProfileViewController: UIViewController {
             case .success(let profile):
                 self?.updateUI(with: profile)
             case .failure(let error):
-                print("Ошибка получения профиля: \(error)")
+                print("[ProfileViewController updateProfileDetails]: Ошибка получения профиля: \(error)")
             }
         }
     }

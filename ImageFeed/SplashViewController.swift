@@ -2,70 +2,88 @@ import UIKit
 import ProgressHUD
 
 final class SplashViewController: UIViewController {
-    
-    private let ShowAuthenticationScreenSegueIdentifier = "ShowAuthenticationScreen"
+    private let imageView = UIImageView()
     private let oauth2TokenStorage = OAuth2TokenStorage.shared
     private let profileService = ProfileService.shared
     private let profileImageService = ProfileImageService.shared
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
+        showSplashScreen()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         checkAuthorizationStatus()
     }
-    
+
     private func checkAuthorizationStatus() {
         if let token = oauth2TokenStorage.token {
             UIBlockingProgressHUD.show()
             fetchProfile(token)
         } else {
-            DispatchQueue.main.async {
-                self.performSegue(withIdentifier: self.ShowAuthenticationScreenSegueIdentifier, sender: self)
-            }
+            showAuthViewController()
         }
     }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        setNeedsStatusBarAppearanceUpdate()
-    }
-    
+
     override var preferredStatusBarStyle: UIStatusBarStyle {
         .lightContent
     }
-    
+
+    // MARK: - Рисуем интерфейс
+    private func showSplashScreen() {
+        view.backgroundColor = .ypBlack
+        imageView.image = UIImage(named: "Image")
+        view.addSubview(imageView)
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            imageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            imageView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            imageView.widthAnchor.constraint(equalToConstant: 75),
+            imageView.heightAnchor.constraint(equalToConstant: 77)
+        ])
+    }
+
+    // MARK: - Функции
+    private func showAuthViewController() {
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        guard let authViewController = storyboard.instantiateViewController(withIdentifier: "AuthViewController") as? AuthViewController else {
+            fatalError("Не удалось инициализировать AuthViewController из Storyboard")
+        }
+        authViewController.delegate = self
+        authViewController.modalPresentationStyle = .fullScreen
+        present(authViewController, animated: true)
+    }
+
     private func switchToTabBarController() {
-        guard let window = UIApplication.shared.windows.first else {
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        guard let tabBarController = storyboard.instantiateViewController(withIdentifier: "TabBarViewController") as? TabBarController else {
+            fatalError("Не удалось инициализировать TabBarController из Storyboard")
+        }
+        
+        // Плавный переход с анимацией
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = windowScene.windows.first else {
             fatalError("Не удалось получить UIWindow")
         }
-        let tabBarController = UIStoryboard(name: "Main", bundle: .main)
-            .instantiateViewController(withIdentifier: "TabBarViewController")
-        
-        // Добавляем плавную анимацию перехода
-        UIView.transition(with: window,
-                          duration: 0.3,
-                          options: .transitionCrossDissolve,
-                          animations: {
-            window.rootViewController = tabBarController
-        })
+        window.rootViewController = tabBarController
     }
-    
+
     private func fetchProfile(_ token: String) {
         profileService.fetchProfile(token) { [weak self] result in
             guard let self = self else { return }
-            
+
             switch result {
                 case .success(let profile):
                     // Запускаем загрузку URL аватарки
-                    self.profileImageService.fetchProfileImageURL(username: profile.username) { profileImageResult in
+                    self.profileImageService.fetchProfileImageURL(username: profile.username) { [weak self] profileImageResult in
+                        guard let self = self else { return }
                         switch profileImageResult {
                             case .success(let imageURL):
                                 print("Ссылка на аватарку: \(imageURL)")
                             case .failure(let error):
-                                print("Не удалось получить ссылку на аватарку: \(error)")
+                                print("[SplashViewController fetchProfile]: Не удалось получить ссылку на аватарку: \(error)")
                         }
                         // Скрываем индикатор загрузки после завершения всех запросов
                         UIBlockingProgressHUD.dismiss()
@@ -75,20 +93,13 @@ final class SplashViewController: UIViewController {
                         }
                     }
                 case .failure(let error):
-                    print("Загрузка профиля завершилась с ошибкой: \(error)")
-                                if let networkError = error as? NetworkError {
-                                    print("Данные сетевой ошибки: \(networkError)")
-                                }
+                    print("[SplashViewController fetchProfile]: Загрузка профиля завершилась с ошибкой: \(error)")
                     UIBlockingProgressHUD.dismiss()
-                    print("Текущий токен: \(token)")
-                    // Показываем ошибку пользователю
                     self.showError(error)
-                    // Если ошибка связана с токеном, выполняем logout
-                    self.handleProfileError(error)
             }
         }
     }
-    
+
     private func showError(_ error: Error) {
         let alert = UIAlertController(
             title: "Ошибка",
@@ -98,27 +109,6 @@ final class SplashViewController: UIViewController {
         let action = UIAlertAction(title: "OK", style: .default)
         alert.addAction(action)
         present(alert, animated: true)
-    }
-    
-    private func handleProfileError(_ error: Error) {
-        // Если ошибка связана с токеном, обнуляем токен
-        oauth2TokenStorage.token = nil
-        // Показываем экран авторизации
-        performSegue(withIdentifier: ShowAuthenticationScreenSegueIdentifier, sender: nil)
-    }
-}
-
-extension SplashViewController {
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == ShowAuthenticationScreenSegueIdentifier {
-            guard
-                let navigationController = segue.destination as? UINavigationController,
-                let viewController = navigationController.viewControllers.first as? AuthViewController
-            else { fatalError("Не получилось перейти на экран авторизации \(ShowAuthenticationScreenSegueIdentifier)") }
-            viewController.delegate = self
-        } else {
-            super.prepare(for: segue, sender: sender)
-        }
     }
 }
 

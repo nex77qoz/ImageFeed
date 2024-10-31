@@ -73,7 +73,7 @@ final class OAuth2Service {
         ]
         
         guard let url = components?.url else {
-            assertionFailure("Не удалось создать URL из URLComponents")
+            assertionFailure("[OAuth2Service makeOAuthTokenRequest]: Не удалось создать URL из URLComponents")
             return nil
         }
         

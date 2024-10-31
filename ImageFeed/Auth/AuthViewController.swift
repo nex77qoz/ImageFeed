@@ -12,7 +12,8 @@ protocol AuthViewControllerDelegate: AnyObject {
 }
 
 final class AuthViewController: UIViewController {
-    private let ShowWebViewSegueIdentifier = "ShowWebView"
+    private let showWebViewSegueIdentifier = "ShowWebView"
+    private let oauth2Service = OAuth2Service.shared
     
     weak var delegate: AuthViewControllerDelegate?
     
@@ -20,7 +21,6 @@ final class AuthViewController: UIViewController {
         super.viewDidLoad()
         configureBackButton()
     }
-    private let oauth2Service = OAuth2Service.shared
     
     func configureBackButton() {
         navigationController?.navigationBar.backIndicatorImage = UIImage(named: "Backward")
@@ -30,11 +30,11 @@ final class AuthViewController: UIViewController {
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == ShowWebViewSegueIdentifier {
+        if segue.identifier == showWebViewSegueIdentifier {
             guard
                 let webViewViewController = segue.destination as? WebViewViewController
             else {
-                assertionFailure("Failed to prepare for \(ShowWebViewSegueIdentifier)")
+                assertionFailure("[AuthViewController prepare for]: Failed to prepare for \(showWebViewSegueIdentifier)")
                 return
             }
             webViewViewController.delegate = self
@@ -49,13 +49,11 @@ extension AuthViewController: WebViewViewControllerDelegate {
         UIBlockingProgressHUD.show()
         oauth2Service.fetchOAuthToken(code) { [weak self] result in
             guard let self = self else { return }
-            
+            UIBlockingProgressHUD.dismiss()
             switch result {
-                case .success:
-                    UIBlockingProgressHUD.dismiss()
+                case .success:    
                     self.delegate?.didAuthenticate(self)
                 case .failure:
-                    UIBlockingProgressHUD.dismiss()
                     let alert = UIAlertController(
                         title: "Что-то пошло не так(",
                         message: "Не удалось войти в систему",

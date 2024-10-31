@@ -21,9 +21,11 @@ final class ProfileImageService {
     func fetchProfileImageURL(username: String, _ completion: @escaping (Result<String, Error>) -> Void) {
         assert(Thread.isMainThread)
         
-        if lastUsername == username {
-            return
+        if lastUsername == username, let existingURL = avatarURL {
+                completion(.success(existingURL))
+                return
         }
+        
         task?.cancel()
         lastUsername = username
         

@@ -72,13 +72,19 @@ final class SplashViewController: UIViewController {
 
     private func fetchProfile(_ token: String) {
         profileService.fetchProfile(token) { [weak self] result in
-            guard let self = self else { return }
+            guard let self = self else {
+                UIBlockingProgressHUD.dismiss()
+                return
+            }
 
             switch result {
                 case .success(let profile):
                     // Запускаем загрузку URL аватарки
                     self.profileImageService.fetchProfileImageURL(username: profile.username) { [weak self] profileImageResult in
-                        guard let self = self else { return }
+                        guard let self = self else {
+                            UIBlockingProgressHUD.dismiss()
+                            return
+                        }
                         switch profileImageResult {
                             case .success(let imageURL):
                                 print("Ссылка на аватарку: \(imageURL)")
@@ -116,6 +122,7 @@ extension SplashViewController: AuthViewControllerDelegate {
     func didAuthenticate(_ vc: AuthViewController) {
         vc.dismiss(animated: true) {
             guard let token = self.oauth2TokenStorage.token else { return }
+            UIBlockingProgressHUD.show()
             self.fetchProfile(token)
         }
     }

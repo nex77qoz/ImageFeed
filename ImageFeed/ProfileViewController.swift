@@ -117,7 +117,6 @@ final class ProfileViewController: UIViewController {
     
     @objc
     private func didTapExitButton() {
-        print("Нажата кнопка выхода")
         oauth2TokenStorage.token = nil
     }
     
@@ -125,7 +124,7 @@ final class ProfileViewController: UIViewController {
     
     private func updateProfileDetails() {
         guard let token = OAuth2TokenStorage.shared.token else {
-            print("Токен недоступен")
+            print("[ProfileViewController updateProfileDetails]: Токен недоступен")
             return
         }
         

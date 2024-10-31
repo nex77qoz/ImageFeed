@@ -49,11 +49,12 @@ extension AuthViewController: WebViewViewControllerDelegate {
         UIBlockingProgressHUD.show()
         oauth2Service.fetchOAuthToken(code) { [weak self] result in
             guard let self = self else { return }
-            UIBlockingProgressHUD.dismiss()
             switch result {
-                case .success:    
+                case .success:
+                    UIBlockingProgressHUD.dismiss()
                     self.delegate?.didAuthenticate(self)
                 case .failure:
+                    UIBlockingProgressHUD.dismiss()
                     let alert = UIAlertController(
                         title: "Что-то пошло не так(",
                         message: "Не удалось войти в систему",

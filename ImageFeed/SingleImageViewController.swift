@@ -8,40 +8,68 @@
 import UIKit
 
 final class SingleImageViewController: UIViewController {
-    var image: UIImage? {
+    var imageURL: String? {
         didSet {
-            guard isViewLoaded, let image else { return }
-            imageView.image = image
-            imageView.frame.size = image.size
-            rescaleAndCenterImageInScrollView(image: image)
+            guard isViewLoaded else { return }
+            loadImage()
         }
     }
     
+    private var activityIndicator: UIActivityIndicatorView {
+        let indicator = UIActivityIndicatorView(style: .large)
+        indicator.color = .ypWhite
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        return indicator
+    }
+
     @IBOutlet private var imageView: UIImageView!
     @IBOutlet weak var scrollView: UIScrollView!
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         scrollView.minimumZoomScale = 0.1
         scrollView.maximumZoomScale = 1.25
         scrollView.delegate = self
-        
-        guard let image else { return }
-        imageView.image = image
-        imageView.frame.size = image.size
-        rescaleAndCenterImageInScrollView(image: image)
+        setupActivityIndicator()
+        loadImage()
     }
-    
+    private func setupActivityIndicator() {
+        view.addSubview(activityIndicator)
+        activityIndicator.center = view.center
+    }
+    private func loadImage() {
+        imageView.image = nil
+        activityIndicator.startAnimating()
+        guard let imageURLString = imageURL, let url = URL(string: imageURLString) else { return }
+
+        let task = URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
+            DispatchQueue.main.async {
+                self?.activityIndicator.stopAnimating()
+                guard
+                    let self = self,
+                    let data = data,
+                    let image = UIImage(data: data)
+                else { return }
+                
+                self.imageView.image = image
+                self.imageView.frame.size = image.size
+                self.rescaleAndCenterImageInScrollView(image: image)
+            }
+        }
+        task.resume()
+    }
+
     @IBAction func didTapShareButton(_ sender: Any) {
-        guard let image else { return }
-        
+        guard let image = imageView.image else { return }
+
         let activityViewController = UIActivityViewController(activityItems: [image], applicationActivities: nil)
         present(activityViewController, animated: true)
     }
+
     @IBAction func didTapBackButton(_ sender: Any) {
         dismiss(animated: true, completion: nil)
     }
-    
+
     private func rescaleAndCenterImageInScrollView(image: UIImage) {
         let minZoomScale = scrollView.minimumZoomScale
         let maxZoomScale = scrollView.maximumZoomScale
@@ -55,14 +83,19 @@ final class SingleImageViewController: UIViewController {
         scrollView.layoutIfNeeded()
         centerImage()
     }
-    
+
     private func centerImage() {
         let scrollViewSize = scrollView.bounds.size
         let imageSize = imageView.frame.size
         let horizontalInset = max(0, (scrollViewSize.width - imageSize.width) / 2)
         let verticalInset = max(0, (scrollViewSize.height - imageSize.height) / 2)
-        
-        scrollView.contentInset = UIEdgeInsets(top: verticalInset, left: horizontalInset, bottom: verticalInset, right: horizontalInset)
+
+        scrollView.contentInset = UIEdgeInsets(
+            top: verticalInset,
+            left: horizontalInset,
+            bottom: verticalInset,
+            right: horizontalInset
+        )
     }
 }
 
@@ -70,7 +103,7 @@ extension SingleImageViewController: UIScrollViewDelegate {
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
         imageView
     }
-    
+
     func scrollViewDidZoom(_ scrollView: UIScrollView) {
         centerImage()
     }

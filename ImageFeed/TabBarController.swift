@@ -16,11 +16,11 @@ final class TabBarController: UITabBarController {
         
         profileViewController.tabBarItem = UITabBarItem(
             title: "",
-            image: UIImage(named: "tab_editorial_active"),
+            image: UIImage(named: "tab_profile_active"),
             selectedImage: nil)
         imagesListViewController.tabBarItem = UITabBarItem(
             title: "",
-            image: UIImage(named: "tab_profile_active"),
+            image: UIImage(named: "tab_editorial_active"),
             selectedImage: nil)
         
         // Встраивание в навигационные контроллеры

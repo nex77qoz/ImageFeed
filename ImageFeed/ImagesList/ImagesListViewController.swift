@@ -66,11 +66,11 @@ final class ImagesListViewController: UIViewController {
 
 extension ImagesListViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-         photos.count
+        photos.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-
+        
         guard let imageListCell = tableView.dequeueReusableCell(
             withIdentifier: ImagesListCell.reuseIdentifier,
             for: indexPath
@@ -138,14 +138,17 @@ extension ImagesListViewController: ImagesListCellDelegate {
         guard let indexPath = tableView.indexPath(for: cell) else { return }
         let photo = photos[indexPath.row]
         let isLiked = !photo.isLiked
+        UIBlockingProgressHUD.show()
         imagesListService.changeLike(photoId: photo.id, isLike: isLiked) { [weak self] result in
             guard let self = self else { return }
             switch result {
-            case .success:
-                self.photos[indexPath.row].isLiked = isLiked
-                cell.setIsLiked(isLiked)
-            case .failure(let error):
-                print("Error changing like status: \(error)")
+                case .success:
+                    self.photos[indexPath.row].isLiked = isLiked
+                    cell.setIsLiked(isLiked)
+                    UIBlockingProgressHUD.dismiss()
+                case .failure(let error):
+                    UIBlockingProgressHUD.dismiss()
+                    print("Ошибка установки лайка: \(error)")
             }
         }
     }

@@ -25,7 +25,6 @@ class ImagesListCell: UITableViewCell {
         button.imageView?.contentMode = .scaleAspectFit
         button.contentVerticalAlignment = .center
         button.contentHorizontalAlignment = .center
-        button.imageEdgeInsets = UIEdgeInsets(top: 13, left: 11.5, bottom: 13, right: 11.5)
         return button
     }()
     
@@ -78,10 +77,10 @@ class ImagesListCell: UITableViewCell {
             
             likeButton.topAnchor.constraint(equalTo: cellImage.topAnchor, constant: 12),
             likeButton.trailingAnchor.constraint(equalTo: cellImage.trailingAnchor, constant: -12),
-            likeButton.widthAnchor.constraint(equalToConstant: 44),
-            likeButton.heightAnchor.constraint(equalToConstant: 44),
+            likeButton.widthAnchor.constraint(equalToConstant: 21),
+            likeButton.heightAnchor.constraint(equalToConstant: 18),
             
-            dateLabel.leadingAnchor.constraint(equalTo: cellImage.leadingAnchor, constant: 16),
+            dateLabel.leadingAnchor.constraint(equalTo: cellImage.leadingAnchor, constant: 8),
             dateLabel.bottomAnchor.constraint(equalTo: cellImage.bottomAnchor, constant: -8)
         ])
     }

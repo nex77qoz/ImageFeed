@@ -70,7 +70,7 @@ final class ImagesListService {
         let nextPage = lastLoadedPage + 1
 
         guard var urlComponents = URLComponents(string: "https://api.unsplash.com/photos") else {
-            print("Invalid URL")
+            print("Неправильный URL")
             isLoading = false
             return
         }
@@ -79,7 +79,7 @@ final class ImagesListService {
             URLQueryItem(name: "per_page", value: "10")
         ]
         guard let url = urlComponents.url else {
-            print("Cannot construct URL from components")
+            print("Не получилось собрать URL из urlComponents")
             isLoading = false
             return
         }
@@ -88,7 +88,7 @@ final class ImagesListService {
         if let token = OAuth2TokenStorage.shared.token {
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         } else {
-            print("Token not available")
+            print("Токен недоступен")
             isLoading = false
             return
         }
@@ -106,7 +106,7 @@ final class ImagesListService {
                 }
             case .failure(let error):
                 DispatchQueue.main.async {
-                    print("Error loading photos: \(error)")
+                    print("Ошибка загрузки фотографий: \(error)")
                     self.isLoading = false
                 }
             }
@@ -148,7 +148,7 @@ final class ImagesListService {
         let size = CGSize(width: width, height: height)
         let createdAt = photoResult.createdAt.flatMap { dateFormatter.date(from: $0) }
         let description = photoResult.description
-        let thumbImageURL = photoResult.urls.thumb
+        let thumbImageURL = photoResult.urls.regular
         let largeImageURL = photoResult.urls.full
         let isLiked = photoResult.likedByUser
         return Photo(

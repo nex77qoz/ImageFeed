@@ -55,18 +55,32 @@ final class ImagesListService {
     
     private let urlSession = URLSession.shared
     private var task: URLSessionTask?
+    private let dateFormatter: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        return formatter
+    }()
+
     
     func fetchPhotosNextPage() {
         guard !isLoading else { return }
         isLoading = true
         let nextPage = lastLoadedPage + 1
 
-        var urlComponents = URLComponents(string: "https://api.unsplash.com/photos")!
+        guard var urlComponents = URLComponents(string: "https://api.unsplash.com/photos") else {
+            print("Некорректный URL")
+            isLoading = false
+            return
+        }
         urlComponents.queryItems = [
             URLQueryItem(name: "page", value: "\(nextPage)"),
             URLQueryItem(name: "per_page", value: "10")
         ]
-        var request = URLRequest(url: urlComponents.url!)
+        guard let url = urlComponents.url else {
+            print("Не удалось получить URL из компонентов")
+            isLoading = false
+            return
+        }
+        var request = URLRequest(url: url)
         request.httpMethod = "GET"
         if let token = OAuth2TokenStorage.shared.token {
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
@@ -100,7 +114,6 @@ final class ImagesListService {
         let width = CGFloat(photoResult.width)
         let height = CGFloat(photoResult.height)
         let size = CGSize(width: width, height: height)
-        let dateFormatter = ISO8601DateFormatter()
         let createdAt = photoResult.createdAt.flatMap { dateFormatter.date(from: $0) }
         let description = photoResult.description
         let thumbImageURL = photoResult.urls.regular

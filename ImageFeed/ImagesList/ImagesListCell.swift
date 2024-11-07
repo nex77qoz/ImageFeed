@@ -8,6 +8,10 @@
 import UIKit
 
 class ImagesListCell: UITableViewCell {
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        cellImage.kf.cancelDownloadTask()
+    }
     static let reuseIdentifier = "ImagesListCell"
     
     let likeButton: UIButton = {

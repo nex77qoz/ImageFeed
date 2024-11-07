@@ -1,10 +1,3 @@
-//
-//  TabBarController.swift
-//  ImageFeed
-//
-//  Created by Максим Бабкин on 30.10.2024.
-//
-
 import UIKit
 
 final class TabBarController: UITabBarController {
@@ -31,3 +24,4 @@ final class TabBarController: UITabBarController {
         viewControllers = [imagesNavController, profileNavController]
     }
 }
+

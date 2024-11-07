@@ -1,9 +1,3 @@
-//
-//  ImagesListService.swift
-//  ImageFeed
-//
-//  Created by Максим Бабкин on 04.11.2024.
-//
 import Foundation
 import UIKit
 
@@ -35,15 +29,24 @@ struct UrlsResult: Decodable {
     let thumb: String
 }
 
-
-struct Photo {
+class Photo {
     let id: String
     let size: CGSize
     let createdAt: Date?
     let welcomeDescription: String?
     let thumbImageURL: String
     let largeImageURL: String
-    let isLiked: Bool
+    var isLiked: Bool
+    
+    init(id: String, size: CGSize, createdAt: Date?, welcomeDescription: String?, thumbImageURL: String, largeImageURL: String, isLiked: Bool) {
+        self.id = id
+        self.size = size
+        self.createdAt = createdAt
+        self.welcomeDescription = welcomeDescription
+        self.thumbImageURL = thumbImageURL
+        self.largeImageURL = largeImageURL
+        self.isLiked = isLiked
+    }
 }
 
 final class ImagesListService {
@@ -67,7 +70,7 @@ final class ImagesListService {
         let nextPage = lastLoadedPage + 1
 
         guard var urlComponents = URLComponents(string: "https://api.unsplash.com/photos") else {
-            print("Некорректный URL")
+            print("Invalid URL")
             isLoading = false
             return
         }
@@ -76,7 +79,7 @@ final class ImagesListService {
             URLQueryItem(name: "per_page", value: "10")
         ]
         guard let url = urlComponents.url else {
-            print("Не удалось получить URL из компонентов")
+            print("Cannot construct URL from components")
             isLoading = false
             return
         }
@@ -85,7 +88,7 @@ final class ImagesListService {
         if let token = OAuth2TokenStorage.shared.token {
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         } else {
-            print("Токен недоступен")
+            print("Token not available")
             isLoading = false
             return
         }
@@ -102,8 +105,37 @@ final class ImagesListService {
                     self.isLoading = false
                 }
             case .failure(let error):
-                print("Ошибка при загрузке фотографий: \(error)")
-                self.isLoading = false
+                DispatchQueue.main.async {
+                    print("Error loading photos: \(error)")
+                    self.isLoading = false
+                }
+            }
+        }
+        task.resume()
+    }
+    
+    func changeLike(photoId: String, isLike: Bool, completion: @escaping (Result<Void, Error>) -> Void) {
+        guard let token = OAuth2TokenStorage.shared.token else {
+            completion(.failure(NetworkError.noData))
+            return
+        }
+        
+        let method = isLike ? "POST" : "DELETE"
+        let urlString = "https://api.unsplash.com/photos/\(photoId)/like"
+        guard let url = URL(string: urlString) else {
+            completion(.failure(NetworkError.invalidRequest))
+            return
+        }
+        var request = URLRequest(url: url)
+        request.httpMethod = method
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        
+        let task = urlSession.dataTask(for: request) { result in
+            switch result {
+            case .success:
+                completion(.success(()))
+            case .failure(let error):
+                completion(.failure(error))
             }
         }
         task.resume()
@@ -116,7 +148,7 @@ final class ImagesListService {
         let size = CGSize(width: width, height: height)
         let createdAt = photoResult.createdAt.flatMap { dateFormatter.date(from: $0) }
         let description = photoResult.description
-        let thumbImageURL = photoResult.urls.regular
+        let thumbImageURL = photoResult.urls.thumb
         let largeImageURL = photoResult.urls.full
         let isLiked = photoResult.likedByUser
         return Photo(

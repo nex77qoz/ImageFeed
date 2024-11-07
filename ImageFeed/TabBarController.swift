@@ -16,12 +16,24 @@ final class TabBarController: UITabBarController {
             image: UIImage(named: "tab_editorial_active"),
             selectedImage: nil)
         
-        // Встраивание в навигационные контроллеры
         let imagesNavController = UINavigationController(rootViewController: imagesListViewController)
         let profileNavController = UINavigationController(rootViewController: profileViewController)
         
-        // Назначение контроллеров в TabBar
+        let navigationBarAppearance = UINavigationBarAppearance()
+        navigationBarAppearance.configureWithOpaqueBackground()
+        navigationBarAppearance.backgroundColor = .ypBlack
+        
+        imagesNavController.navigationBar.standardAppearance = navigationBarAppearance
+        imagesNavController.navigationBar.scrollEdgeAppearance = navigationBarAppearance
+        
+        profileNavController.navigationBar.standardAppearance = navigationBarAppearance
+        profileNavController.navigationBar.scrollEdgeAppearance = navigationBarAppearance
+        
+        imagesNavController.navigationBar.tintColor = .white
+        profileNavController.navigationBar.tintColor = .white
+        
+        tabBar.backgroundColor = .ypBlack
+        
         viewControllers = [imagesNavController, profileNavController]
     }
 }
-

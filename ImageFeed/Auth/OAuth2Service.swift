@@ -1,9 +1,3 @@
-//
-//  OAuth2Service.swift
-//  ImageFeed
-//
-//  Created by Максим Бабкин on 29.09.2024.
-//
 import UIKit
 
 enum AuthServiceError: Error {

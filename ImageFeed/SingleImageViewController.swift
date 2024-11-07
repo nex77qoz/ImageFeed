@@ -1,10 +1,3 @@
-//
-//  SingleImageViewController.swift
-//  ImageFeed
-//
-//  Created by Максим Бабкин on 08.09.2024.
-//
-
 import UIKit
 
 final class SingleImageViewController: UIViewController {
@@ -15,15 +8,15 @@ final class SingleImageViewController: UIViewController {
         }
     }
     
-    private var activityIndicator: UIActivityIndicatorView {
+    private let activityIndicator: UIActivityIndicatorView = {
         let indicator = UIActivityIndicatorView(style: .large)
         indicator.color = .ypWhite
         indicator.translatesAutoresizingMaskIntoConstraints = false
         return indicator
-    }
+    }()
 
     @IBOutlet private var imageView: UIImageView!
-    @IBOutlet weak var scrollView: UIScrollView!
+    @IBOutlet private weak var scrollView: UIScrollView!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,7 +28,10 @@ final class SingleImageViewController: UIViewController {
     }
     private func setupActivityIndicator() {
         view.addSubview(activityIndicator)
-        activityIndicator.center = view.center
+        NSLayoutConstraint.activate([
+            activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+        ])
     }
     private func loadImage() {
         imageView.image = nil

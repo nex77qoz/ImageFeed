@@ -1,59 +1,112 @@
 import UIKit
+import Kingfisher
+import ProgressHUD
 
 final class SingleImageViewController: UIViewController {
+    // MARK: - Свойства
+    
     var imageURL: String? {
         didSet {
             guard isViewLoaded else { return }
             loadImage()
         }
     }
-    
-    private let activityIndicator: UIActivityIndicatorView = {
-        let indicator = UIActivityIndicatorView(style: .large)
-        indicator.color = .ypWhite
-        indicator.translatesAutoresizingMaskIntoConstraints = false
-        return indicator
-    }()
 
     @IBOutlet private var imageView: UIImageView!
     @IBOutlet private weak var scrollView: UIScrollView!
+    
+    // Флаг для предотвращения повторного вызова adjustImageView
+    private var hasAdjustedImageView = false
+
+    // MARK: - Жизненный цикл
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        scrollView.minimumZoomScale = 0.1
-        scrollView.maximumZoomScale = 1.25
-        scrollView.delegate = self
-        setupActivityIndicator()
+        imageView.contentMode = .scaleAspectFit
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        setupScrollView()
         loadImage()
     }
-    private func setupActivityIndicator() {
-        view.addSubview(activityIndicator)
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        // Вызываем adjustImageView только один раз после загрузки изображения и обновления макета
+        if hasAdjustedImageView {
+            return
+        }
+        if imageView.image != nil {
+            adjustImageView()
+            hasAdjustedImageView = true
+        }
+    }
+
+    // MARK: - Настройка ScrollView
+
+    private func setupScrollView() {
+        scrollView.minimumZoomScale = 1.0
+        scrollView.maximumZoomScale = 3.0
+        scrollView.delegate = self
+        
+        // Устанавливаем ограничения для imageView относительно scrollView
         NSLayoutConstraint.activate([
-            activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+            imageView.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
+            imageView.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
+            imageView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
+            imageView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor)
+            // Удаляем ограничения на ширину и высоту
         ])
     }
+
+    // MARK: - Загрузка изображения
+
     private func loadImage() {
         imageView.image = nil
-        activityIndicator.startAnimating()
-        guard let imageURLString = imageURL, let url = URL(string: imageURLString) else { return }
 
-        let task = URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
-            DispatchQueue.main.async {
-                self?.activityIndicator.stopAnimating()
-                guard
-                    let self = self,
-                    let data = data,
-                    let image = UIImage(data: data)
-                else { return }
-                
-                self.imageView.image = image
-                self.imageView.frame.size = image.size
-                self.rescaleAndCenterImageInScrollView(image: image)
+        guard let imageURLString = imageURL, let url = URL(string: imageURLString) else {
+            ProgressHUD.failed("Неверный URL изображения")
+            return
+        }
+        ProgressHUD.animate()
+        imageView.kf.setImage(with: url, options: [.transition(.fade(0.2))]) { [weak self] result in
+            ProgressHUD.dismiss()
+            
+            switch result {
+            case .success(let value):
+                self?.imageView.image = value.image
+                DispatchQueue.main.async {
+                    // Сбрасываем флаг, чтобы adjustImageView мог быть вызван снова при обновлении макета
+                    self?.hasAdjustedImageView = false
+                    self?.adjustImageView()
+                }
+            case .failure(_):
+                self?.showError()
             }
         }
-        task.resume()
     }
+    
+    // MARK: - Настройка ImageView после загрузки изображения
+    
+    private func adjustImageView() {
+        guard let image = imageView.image else { return }
+        
+        let scrollViewSize = scrollView.bounds.size
+        let imageSize = image.size
+        
+        // Вычисляем масштаб для минимального масштабирования, чтобы изображение заполняло экран
+        let widthScale = scrollViewSize.width / imageSize.width
+        let heightScale = scrollViewSize.height / imageSize.height
+        let minScale = min(widthScale, heightScale)
+        
+        scrollView.minimumZoomScale = minScale
+        scrollView.zoomScale = minScale
+        
+        // Устанавливаем максимальный масштаб, чтобы пользователи могли увеличивать изображение до 3x от минимального масштаба
+        scrollView.maximumZoomScale = max(minScale * 3, 1.0)
+        
+        centerImage()
+    }
+
+    // MARK: - Функции кнопок
 
     @IBAction func didTapShareButton(_ sender: Any) {
         guard let image = imageView.image else { return }
@@ -66,25 +119,14 @@ final class SingleImageViewController: UIViewController {
         dismiss(animated: true, completion: nil)
     }
 
-    private func rescaleAndCenterImageInScrollView(image: UIImage) {
-        let minZoomScale = scrollView.minimumZoomScale
-        let maxZoomScale = scrollView.maximumZoomScale
-        view.layoutIfNeeded()
-        let visibleRectSize = scrollView.bounds.size
-        let imageSize = image.size
-        let hScale = visibleRectSize.width / imageSize.width
-        let vScale = visibleRectSize.height / imageSize.height
-        let scale = min(maxZoomScale, max(minZoomScale, min(hScale, vScale)))
-        scrollView.setZoomScale(scale, animated: false)
-        scrollView.layoutIfNeeded()
-        centerImage()
-    }
+    // MARK: - Центрирование изображения
 
     private func centerImage() {
         let scrollViewSize = scrollView.bounds.size
-        let imageSize = imageView.frame.size
-        let horizontalInset = max(0, (scrollViewSize.width - imageSize.width) / 2)
-        let verticalInset = max(0, (scrollViewSize.height - imageSize.height) / 2)
+        let imageViewSize = imageView.frame.size
+        
+        let horizontalInset = imageViewSize.width < scrollViewSize.width ? (scrollViewSize.width - imageViewSize.width) / 2 : 0
+        let verticalInset = imageViewSize.height < scrollViewSize.height ? (scrollViewSize.height - imageViewSize.height) / 2 : 0
 
         scrollView.contentInset = UIEdgeInsets(
             top: verticalInset,
@@ -93,11 +135,33 @@ final class SingleImageViewController: UIViewController {
             right: horizontalInset
         )
     }
+    
+    // MARK: - Функция отображения ошибки
+
+    private func showError() {
+        let alert = UIAlertController(
+            title: "Ошибка",
+            message: "Что-то пошло не так. Попробовать ещё раз?",
+            preferredStyle: .alert
+        )
+        
+        let cancelAction = UIAlertAction(title: "Не надо", style: .cancel, handler: nil)
+        let retryAction = UIAlertAction(title: "Повторить", style: .default) { [weak self] _ in
+            self?.loadImage()
+        }
+        
+        alert.addAction(cancelAction)
+        alert.addAction(retryAction)
+        
+        present(alert, animated: true, completion: nil)
+    }
 }
+
+// MARK: - UIScrollViewDelegate
 
 extension SingleImageViewController: UIScrollViewDelegate {
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
-        imageView
+        return imageView
     }
 
     func scrollViewDidZoom(_ scrollView: UIScrollView) {

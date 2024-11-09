@@ -6,17 +6,49 @@ final class SplashViewController: UIViewController {
     private let oauth2TokenStorage = OAuth2TokenStorage.shared
     private let profileService = ProfileService.shared
     private let profileImageService = ProfileImageService.shared
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         showSplashScreen()
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleLogout),
+            name: .didLogout,
+            object: nil
+        )
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self, name: .didLogout, object: nil)
+    }
+    
+    private func setupObservers() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleLogout),
+            name: .didLogout,
+            object: nil
+        )
+    }
+    
+    @objc private func handleLogout() {
+        print("Выход из системы")
+        DispatchQueue.main.async {
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            guard let authVC = storyboard.instantiateViewController(withIdentifier: "AuthViewController") as? AuthViewController else {
+                fatalError("AuthViewController не найден в Storyboard")
+            }
+            authVC.modalPresentationStyle = .fullScreen
+            self.present(authVC, animated: true) {
+            }
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         checkAuthorizationStatus()
     }
-
+    
     private func checkAuthorizationStatus() {
         if let token = oauth2TokenStorage.token {
             UIBlockingProgressHUD.show()
@@ -25,18 +57,18 @@ final class SplashViewController: UIViewController {
             showAuthViewController()
         }
     }
-
+    
     override var preferredStatusBarStyle: UIStatusBarStyle {
         .lightContent
     }
-
+    
     // MARK: - Рисуем интерфейс
     private func showSplashScreen() {
         view.backgroundColor = .ypBlack
         imageView.image = UIImage(named: "Image")
         view.addSubview(imageView)
         imageView.translatesAutoresizingMaskIntoConstraints = false
-
+        
         NSLayoutConstraint.activate([
             imageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             imageView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
@@ -44,7 +76,7 @@ final class SplashViewController: UIViewController {
             imageView.heightAnchor.constraint(equalToConstant: 77)
         ])
     }
-
+    
     // MARK: - Функции
     private func showAuthViewController() {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
@@ -55,7 +87,8 @@ final class SplashViewController: UIViewController {
         authViewController.modalPresentationStyle = .fullScreen
         present(authViewController, animated: true)
     }
-
+    
+    
     private func switchToTabBarController() {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         guard let tabBarController = storyboard.instantiateViewController(withIdentifier: "TabBarViewController") as? TabBarController else {
@@ -69,14 +102,14 @@ final class SplashViewController: UIViewController {
         }
         window.rootViewController = tabBarController
     }
-
+    
     private func fetchProfile(_ token: String) {
         profileService.fetchProfile(token) { [weak self] result in
             guard let self = self else {
                 UIBlockingProgressHUD.dismiss()
                 return
             }
-
+            
             switch result {
                 case .success(let profile):
                     // Запускаем загрузку URL аватарки
@@ -105,7 +138,7 @@ final class SplashViewController: UIViewController {
             }
         }
     }
-
+    
     private func showError(_ error: Error) {
         let alert = UIAlertController(
             title: "Ошибка",

@@ -22,8 +22,8 @@ final class ProfileImageService {
         assert(Thread.isMainThread)
         
         if lastUsername == username, let existingURL = avatarURL {
-                completion(.success(existingURL))
-                return
+            completion(.success(existingURL))
+            return
         }
         
         task?.cancel()
@@ -42,23 +42,28 @@ final class ProfileImageService {
                 self.lastUsername = nil
                 
                 switch result {
-                case .success(let userResult):
-                    let avatarURL = userResult.profileImage.small
-                    self.avatarURL = avatarURL
-                    completion(.success(avatarURL))
-                    NotificationCenter.default.post(
-                        name: ProfileImageService.didChangeNotification,
-                        object: self,
-                        userInfo: ["URL": avatarURL]
-                    )
-                case .failure(let error):
-                    print("[ProfileImageService fetchProfileImageURL]: Ошибка - \(error.localizedDescription)")
-                    completion(.failure(error))
+                    case .success(let userResult):
+                        let avatarURL = userResult.profileImage.small
+                        self.avatarURL = avatarURL
+                        completion(.success(avatarURL))
+                        NotificationCenter.default.post(
+                            name: ProfileImageService.didChangeNotification,
+                            object: self,
+                            userInfo: ["URL": avatarURL]
+                        )
+                    case .failure(let error):
+                        print("[ProfileImageService fetchProfileImageURL]: Ошибка - \(error.localizedDescription)")
+                        completion(.failure(error))
                 }
             }
         }
         self.task = task
         task.resume()
+    }
+    
+    func resetAvatarURL() {
+        self.avatarURL = nil
+        NotificationCenter.default.post(name: ProfileImageService.didChangeNotification, object: nil)
     }
     
     private func makeRequest(username: String) -> URLRequest? {
@@ -87,5 +92,5 @@ struct UserResult: Codable {
         let small: String
         let medium: String
         let large: String
-        }
+    }
 }

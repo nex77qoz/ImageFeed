@@ -15,7 +15,6 @@ final class SingleImageViewController: UIViewController {
     @IBOutlet private var imageView: UIImageView!
     @IBOutlet private weak var scrollView: UIScrollView!
     
-    // Флаг для предотвращения повторного вызова adjustImageView
     private var hasAdjustedImageView = false
 
     // MARK: - Жизненный цикл
@@ -30,7 +29,6 @@ final class SingleImageViewController: UIViewController {
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        // Вызываем adjustImageView только один раз после загрузки изображения и обновления макета
         if hasAdjustedImageView {
             return
         }
@@ -47,13 +45,11 @@ final class SingleImageViewController: UIViewController {
         scrollView.maximumZoomScale = 3.0
         scrollView.delegate = self
         
-        // Устанавливаем ограничения для imageView относительно scrollView
         NSLayoutConstraint.activate([
             imageView.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
             imageView.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
             imageView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
             imageView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor)
-            // Удаляем ограничения на ширину и высоту
         ])
     }
 
@@ -74,7 +70,6 @@ final class SingleImageViewController: UIViewController {
             case .success(let value):
                 self?.imageView.image = value.image
                 DispatchQueue.main.async {
-                    // Сбрасываем флаг, чтобы adjustImageView мог быть вызван снова при обновлении макета
                     self?.hasAdjustedImageView = false
                     self?.adjustImageView()
                 }

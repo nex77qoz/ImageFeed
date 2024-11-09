@@ -25,11 +25,12 @@ final class ProfileViewController: UIViewController {
                 self.updateAvatar()
             }
     }
+    
     private func updateAvatar() {
         guard
             let avatarURL = ProfileImageService.shared.avatarURL,
             let url = URL(string: avatarURL)
-                else { return }
+        else { return }
         imageView.kf.setImage(with: url)
     }
     // MARK: - Рисуем интерфейс
@@ -87,7 +88,7 @@ final class ProfileViewController: UIViewController {
             profileDescription.leadingAnchor.constraint(equalTo: imageView.leadingAnchor),
             profileDescription.topAnchor.constraint(equalTo: nicknameLabel.bottomAnchor, constant: 8),
             profileDescription.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -24)
-            ])
+        ])
     }
     
     private func showExitButton() {
@@ -95,7 +96,7 @@ final class ProfileViewController: UIViewController {
             fatalError("Не найдено изображение Exit")
         }
         let button = UIButton.systemButton(with: exitImage, target: self, action: #selector(Self.didTapExitButton))
-
+        
         button.tintColor = .ypRed
         view.addSubview(button)
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -105,12 +106,13 @@ final class ProfileViewController: UIViewController {
             button.widthAnchor.constraint(equalToConstant: 24),
             button.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -24),
             button.centerYAnchor.constraint(equalTo: imageView.centerYAnchor)
-            ])
+        ])
     }
     
     @objc
     private func didTapExitButton() {
-        oauth2TokenStorage.token = nil
+        ProfileLogoutService.shared.logout()
+        
     }
     
     // MARK: - Получение данных профиля
@@ -123,10 +125,10 @@ final class ProfileViewController: UIViewController {
         
         ProfileService.shared.fetchProfile(token) { [weak self] result in
             switch result {
-            case .success(let profile):
-                self?.updateUI(with: profile)
-            case .failure(let error):
-                print("[ProfileViewController updateProfileDetails]: Ошибка получения профиля: \(error)")
+                case .success(let profile):
+                    self?.updateUI(with: profile)
+                case .failure(let error):
+                    print("[ProfileViewController updateProfileDetails]: Ошибка получения профиля: \(error)")
             }
         }
     }

@@ -9,7 +9,7 @@ struct PhotoResult: Decodable {
     let likedByUser: Bool
     let description: String?
     let urls: UrlsResult
-
+    
     enum CodingKeys: String, CodingKey {
         case id
         case createdAt = "created_at"
@@ -50,6 +50,9 @@ class Photo {
 }
 
 final class ImagesListService {
+    static let shared = ImagesListService()
+    private init() {}
+    
     static let didChangeNotification = Notification.Name("ImagesListServiceDidChange")
     
     private (set) var photos: [Photo] = []
@@ -62,13 +65,12 @@ final class ImagesListService {
         let formatter = ISO8601DateFormatter()
         return formatter
     }()
-
     
     func fetchPhotosNextPage() {
         guard !isLoading else { return }
         isLoading = true
         let nextPage = lastLoadedPage + 1
-
+        
         guard var urlComponents = URLComponents(string: "https://api.unsplash.com/photos") else {
             print("Неправильный URL")
             isLoading = false
@@ -92,25 +94,26 @@ final class ImagesListService {
             isLoading = false
             return
         }
-
+        
         let task = urlSession.objectTask(for: request) { [weak self] (result: Result<[PhotoResult], Error>) in
             guard let self = self else { return }
             switch result {
-            case .success(let photoResults):
-                let newPhotos = photoResults.map { self.convert($0) }
-                DispatchQueue.main.async {
-                    self.photos.append(contentsOf: newPhotos)
-                    NotificationCenter.default.post(name: ImagesListService.didChangeNotification, object: nil)
-                    self.lastLoadedPage = nextPage
-                    self.isLoading = false
-                }
-            case .failure(let error):
-                DispatchQueue.main.async {
-                    print("Ошибка загрузки фотографий: \(error)")
-                    self.isLoading = false
-                }
+                case .success(let photoResults):
+                    let newPhotos = photoResults.map { self.convert($0) }
+                    DispatchQueue.main.async {
+                        self.photos.append(contentsOf: newPhotos)
+                        NotificationCenter.default.post(name: ImagesListService.didChangeNotification, object: nil)
+                        self.lastLoadedPage = nextPage
+                        self.isLoading = false
+                    }
+                case .failure(let error):
+                    DispatchQueue.main.async {
+                        print("Ошибка загрузки фотографий: \(error)")
+                        self.isLoading = false
+                    }
             }
         }
+        self.task = task
         task.resume()
     }
     
@@ -132,10 +135,10 @@ final class ImagesListService {
         
         let task = urlSession.dataTask(for: request) { result in
             switch result {
-            case .success:
-                completion(.success(()))
-            case .failure(let error):
-                completion(.failure(error))
+                case .success:
+                    completion(.success(()))
+                case .failure(let error):
+                    completion(.failure(error))
             }
         }
         task.resume()
@@ -160,5 +163,11 @@ final class ImagesListService {
             largeImageURL: largeImageURL,
             isLiked: isLiked
         )
+    }
+    
+    func resetPhotos() {
+        self.photos = []
+        self.lastLoadedPage = 0
+        NotificationCenter.default.post(name: ImagesListService.didChangeNotification, object: nil)
     }
 }

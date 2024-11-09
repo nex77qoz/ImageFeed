@@ -13,7 +13,7 @@ final class ProfileService {
     private var profile: Profile?
     
     private init() {}
-
+    
     func fetchProfile(_ token: String, completion: @escaping (Result<Profile, Error>) -> Void) {
         assert(Thread.isMainThread)
         task?.cancel()
@@ -30,19 +30,23 @@ final class ProfileService {
                 self.task = nil
                 
                 switch result {
-                case .success(let profileResult):
-                    let profile = Profile(profileResult: profileResult)
-                    self.profile = profile
-                    completion(.success(profile))
-                case .failure(let error):
-                    print("[ProfileService fetchProfile]: Ошибка - \(error.localizedDescription)")
-                    completion(.failure(error))
+                    case .success(let profileResult):
+                        let profile = Profile(profileResult: profileResult)
+                        self.profile = profile
+                        completion(.success(profile))
+                    case .failure(let error):
+                        print("[ProfileService fetchProfile]: Ошибка - \(error.localizedDescription)")
+                        completion(.failure(error))
                 }
             }
         }
         
         self.task = task
         task.resume()
+    }
+    
+    func resetProfile() {
+        self.profile = nil
     }
     
     private func makeProfileRequest(token: String) -> URLRequest? {

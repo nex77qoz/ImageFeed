@@ -4,7 +4,7 @@ import Kingfisher
 final class ImagesListViewController: UIViewController {
     @IBOutlet weak var tableView: UITableView!
     
-    private let imagesListService = ImagesListService()
+    private let imagesListService = ImagesListService.shared
     private var photos: [Photo] = []
     private let showSingleImageSegueIdentifier = "ShowSingleImage"
     private let placeholderImage = UIImage(named: "placeholder")
@@ -38,12 +38,21 @@ final class ImagesListViewController: UIViewController {
         let oldCount = self.photos.count
         self.photos = self.imagesListService.photos
         let newCount = self.photos.count
-        if oldCount != newCount {
-            tableView.performBatchUpdates {
-                let indexPaths = (oldCount..<newCount).map { IndexPath(row: $0, section: 0) }
-                tableView.insertRows(at: indexPaths, with: .automatic)
-            }
+        
+        tableView.beginUpdates()
+        if newCount > oldCount {
+            // Добавление новых строк
+            let indexPaths = (oldCount..<newCount).map { IndexPath(row: $0, section: 0) }
+            tableView.insertRows(at: indexPaths, with: .automatic)
+        } else if newCount < oldCount {
+            // Удаление строк
+            let indexPaths = (newCount..<oldCount).map { IndexPath(row: $0, section: 0) }
+            tableView.deleteRows(at: indexPaths, with: .automatic)
+        } else {
+            // Если количество не изменилось, можно перезагрузить данные или ничего не делать
+            tableView.reloadData()
         }
+        tableView.endUpdates()
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -70,7 +79,7 @@ extension ImagesListViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
+
         guard let imageListCell = tableView.dequeueReusableCell(
             withIdentifier: ImagesListCell.reuseIdentifier,
             for: indexPath
@@ -139,7 +148,7 @@ extension ImagesListViewController: ImagesListCellDelegate {
         let photo = photos[indexPath.row]
         let isLiked = !photo.isLiked
         UIBlockingProgressHUD.show()
-        imagesListService.changeLike(photoId: photo.id, isLike: isLiked) { [weak self] result in
+        imagesListService.changeLike(photoId: photo.id, isLike: isLiked) { [weak self] (result: Result<Void, Error>) in
             guard let self = self else { return }
             switch result {
                 case .success:

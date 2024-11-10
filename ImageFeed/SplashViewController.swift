@@ -10,38 +10,10 @@ final class SplashViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         showSplashScreen()
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(handleLogout),
-            name: .didLogout,
-            object: nil
-        )
     }
     
     deinit {
         NotificationCenter.default.removeObserver(self, name: .didLogout, object: nil)
-    }
-    
-    private func setupObservers() {
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(handleLogout),
-            name: .didLogout,
-            object: nil
-        )
-    }
-    
-    @objc private func handleLogout() {
-        print("Выход из системы")
-        DispatchQueue.main.async {
-            let storyboard = UIStoryboard(name: "Main", bundle: nil)
-            guard let authVC = storyboard.instantiateViewController(withIdentifier: "AuthViewController") as? AuthViewController else {
-                fatalError("AuthViewController не найден в Storyboard")
-            }
-            authVC.modalPresentationStyle = .fullScreen
-            self.present(authVC, animated: true) {
-            }
-        }
     }
     
     override func viewDidAppear(_ animated: Bool) {

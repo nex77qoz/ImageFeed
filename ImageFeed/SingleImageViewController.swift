@@ -87,16 +87,14 @@ final class SingleImageViewController: UIViewController {
         let scrollViewSize = scrollView.bounds.size
         let imageSize = image.size
         
-        // Вычисляем масштаб для минимального масштабирования, чтобы изображение заполняло экран
         let widthScale = scrollViewSize.width / imageSize.width
         let heightScale = scrollViewSize.height / imageSize.height
         let minScale = min(widthScale, heightScale)
         
         scrollView.minimumZoomScale = minScale
         scrollView.zoomScale = minScale
-        
-        // Устанавливаем максимальный масштаб, чтобы пользователи могли увеличивать изображение до 3x от минимального масштаба
         scrollView.maximumZoomScale = max(minScale * 3, 1.0)
+        scrollView.layoutIfNeeded()
         
         centerImage()
     }
@@ -140,15 +138,12 @@ final class SingleImageViewController: UIViewController {
             preferredStyle: .alert
         )
         
-        let cancelAction = UIAlertAction(title: "Не надо", style: .cancel, handler: nil)
-        let retryAction = UIAlertAction(title: "Повторить", style: .default) { [weak self] _ in
+        alert.addAction(UIAlertAction(title: "Не надо", style: .cancel))
+        alert.addAction(UIAlertAction(title: "Повторить", style: .default) { [weak self] _ in
             self?.loadImage()
-        }
+        })
         
-        alert.addAction(cancelAction)
-        alert.addAction(retryAction)
-        
-        present(alert, animated: true, completion: nil)
+        present(alert, animated: true)
     }
 }
 

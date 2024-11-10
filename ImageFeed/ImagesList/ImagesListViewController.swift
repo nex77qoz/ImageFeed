@@ -41,15 +41,12 @@ final class ImagesListViewController: UIViewController {
         
         tableView.beginUpdates()
         if newCount > oldCount {
-            // Добавление новых строк
             let indexPaths = (oldCount..<newCount).map { IndexPath(row: $0, section: 0) }
             tableView.insertRows(at: indexPaths, with: .automatic)
         } else if newCount < oldCount {
-            // Удаление строк
             let indexPaths = (newCount..<oldCount).map { IndexPath(row: $0, section: 0) }
             tableView.deleteRows(at: indexPaths, with: .automatic)
         } else {
-            // Если количество не изменилось, можно перезагрузить данные или ничего не делать
             tableView.reloadData()
         }
         tableView.endUpdates()
@@ -79,7 +76,6 @@ extension ImagesListViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-
         guard let imageListCell = tableView.dequeueReusableCell(
             withIdentifier: ImagesListCell.reuseIdentifier,
             for: indexPath

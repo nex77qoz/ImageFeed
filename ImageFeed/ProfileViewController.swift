@@ -11,6 +11,40 @@ final class ProfileViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupProfileView()
+        
+        profileImageServiceObserver = NotificationCenter.default.addObserver(
+            forName: ProfileImageService.didChangeNotification, object: nil, queue: .main) { [weak self] _ in
+                guard let self = self else { return }
+                self.updateAvatar()
+            }
+        NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(handleLogout),
+                name: .didLogout,
+                object: nil
+            )
+
+    }
+    deinit {
+        NotificationCenter.default.removeObserver(self, name: .didLogout, object: nil)
+    }
+    @objc private func handleLogout() {
+        print("Выход из системы")
+        DispatchQueue.main.async {
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            guard let authVC = storyboard.instantiateViewController(withIdentifier: "AuthViewController") as? AuthViewController else { fatalError("AuthViewController не найден в Storyboard") }
+            authVC.modalPresentationStyle = .fullScreen
+            self.present(authVC, animated: true)
+        }
+    }
+    private func updateAvatar() {
+        if let url = URL(string: ProfileImageService.shared.avatarURL ?? "") {
+            imageView.kf.setImage(with: url)
+        }
+    }
+    // MARK: - Рисуем интерфейс
+    private func setupProfileView() {
         showProfileImage()
         showName()
         showNicknameLabel()
@@ -18,22 +52,8 @@ final class ProfileViewController: UIViewController {
         showExitButton()
         updateProfileDetails()
         view.backgroundColor = .ypBlack
-        
-        profileImageServiceObserver = NotificationCenter.default.addObserver(
-            forName: ProfileImageService.didChangeNotification, object: nil, queue: .main) { [weak self] _ in
-                guard let self = self else { return }
-                self.updateAvatar()
-            }
     }
     
-    private func updateAvatar() {
-        guard
-            let avatarURL = ProfileImageService.shared.avatarURL,
-            let url = URL(string: avatarURL)
-        else { return }
-        imageView.kf.setImage(with: url)
-    }
-    // MARK: - Рисуем интерфейс
     private func showProfileImage() {
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true

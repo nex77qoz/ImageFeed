@@ -1,6 +1,8 @@
 import Foundation
 import UIKit
 
+// MARK: - Models
+
 struct PhotoResult: Decodable {
     let id: String
     let createdAt: String?
@@ -30,6 +32,8 @@ struct UrlsResult: Decodable {
 }
 
 class Photo {
+    // MARK: - Properties
+    
     let id: String
     let size: CGSize
     let createdAt: Date?
@@ -37,6 +41,8 @@ class Photo {
     let thumbImageURL: String
     let largeImageURL: String
     var isLiked: Bool
+    
+    // MARK: - Initializer
     
     init(id: String, size: CGSize, createdAt: Date?, welcomeDescription: String?, thumbImageURL: String, largeImageURL: String, isLiked: Bool) {
         self.id = id
@@ -49,13 +55,20 @@ class Photo {
     }
 }
 
+// MARK: - Services
+
 final class ImagesListService {
+    // MARK: - Singleton
+    
     static let shared = ImagesListService()
-    private init() {}
+    
+    // MARK: - Notifications
     
     static let didChangeNotification = Notification.Name("ImagesListServiceDidChange")
     
-    private (set) var photos: [Photo] = []
+    // MARK: - Properties
+    
+    private(set) var photos: [Photo] = []
     private var lastLoadedPage = 0
     private var isLoading = false
     
@@ -65,6 +78,12 @@ final class ImagesListService {
         let formatter = ISO8601DateFormatter()
         return formatter
     }()
+    
+    // MARK: - Initializer
+    
+    private init() {}
+    
+    // MARK: - Public Methods
     
     func fetchPhotosNextPage() {
         guard !isLoading else { return }
@@ -144,6 +163,14 @@ final class ImagesListService {
         task.resume()
     }
     
+    func resetPhotos() {
+        self.photos = []
+        self.lastLoadedPage = 0
+        NotificationCenter.default.post(name: ImagesListService.didChangeNotification, object: nil)
+    }
+    
+    // MARK: - Private Methods
+    
     private func convert(_ photoResult: PhotoResult) -> Photo {
         let id = photoResult.id
         let width = CGFloat(photoResult.width)
@@ -163,11 +190,5 @@ final class ImagesListService {
             largeImageURL: largeImageURL,
             isLiked: isLiked
         )
-    }
-    
-    func resetPhotos() {
-        self.photos = []
-        self.lastLoadedPage = 0
-        NotificationCenter.default.post(name: ImagesListService.didChangeNotification, object: nil)
     }
 }

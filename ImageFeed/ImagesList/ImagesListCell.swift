@@ -5,6 +5,8 @@ protocol ImagesListCellDelegate: AnyObject {
 }
 
 class ImagesListCell: UITableViewCell {
+    // MARK: - Properties
+
     static let reuseIdentifier = "ImagesListCell"
     
     weak var delegate: ImagesListCellDelegate?
@@ -36,16 +38,10 @@ class ImagesListCell: UITableViewCell {
         return label
     }()
     
-    @objc private func likeButtonTapped() {
-        delegate?.imageListCellDidTapLike(self)
-    }
+    private var gradientLayer: CAGradientLayer?
     
-    func setIsLiked(_ isLiked: Bool) {
-        let likeImageName = isLiked ? "Active" : "No Active"
-        let likeImage = UIImage(named: likeImageName)?.withRenderingMode(.alwaysOriginal)
-        likeButton.setImage(likeImage, for: .normal)
-    }
-    
+    // MARK: - Initializers
+
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupSubviews()
@@ -64,6 +60,67 @@ class ImagesListCell: UITableViewCell {
         backgroundColor = .ypBlack
     }
     
+    // MARK: - Override Methods
+
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        cellImage.image = nil
+        removeGradientAnimation()
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        gradientLayer?.frame = cellImage.bounds
+    }
+    
+    // MARK: - Actions
+
+    @objc private func likeButtonTapped() {
+        delegate?.imageListCellDidTapLike(self)
+    }
+    
+    // MARK: - Public Methods
+
+    func setIsLiked(_ isLiked: Bool) {
+        let likeImageName = isLiked ? "Active" : "No Active"
+        let likeImage = UIImage(named: likeImageName)?.withRenderingMode(.alwaysOriginal)
+        likeButton.setImage(likeImage, for: .normal)
+    }
+    
+    func addGradientAnimation() {
+        gradientLayer?.removeFromSuperlayer()
+        
+        let gradient = CAGradientLayer()
+        gradient.frame = cellImage.bounds
+        gradient.locations = [0, 0.1, 0.3]
+        gradient.colors = [
+            UIColor(red: 0.682, green: 0.686, blue: 0.706, alpha: 1).cgColor,
+            UIColor(red: 0.531, green: 0.533, blue: 0.553, alpha: 1).cgColor,
+            UIColor(red: 0.431, green: 0.433, blue: 0.453, alpha: 1).cgColor
+        ]
+        gradient.startPoint = CGPoint(x: 0, y: 0.5)
+        gradient.endPoint = CGPoint(x: 1, y: 0.5)
+        gradient.cornerRadius = cellImage.layer.cornerRadius
+        gradient.masksToBounds = true
+        
+        cellImage.layer.addSublayer(gradient)
+        self.gradientLayer = gradient
+        
+        let gradientChangeAnimation = CABasicAnimation(keyPath: "locations")
+        gradientChangeAnimation.duration = 1.0
+        gradientChangeAnimation.repeatCount = .infinity
+        gradientChangeAnimation.fromValue = [0, 0.1, 0.3]
+        gradientChangeAnimation.toValue = [0, 0.8, 1]
+        gradient.add(gradientChangeAnimation, forKey: "locationsChange")
+    }
+    
+    func removeGradientAnimation() {
+        gradientLayer?.removeFromSuperlayer()
+        gradientLayer = nil
+    }
+    
+    // MARK: - Private Methods
+
     private func setupSubviews() {
         contentView.addSubview(cellImage)
         contentView.addSubview(likeButton)

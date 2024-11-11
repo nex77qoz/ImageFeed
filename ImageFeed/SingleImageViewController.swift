@@ -14,11 +14,11 @@ final class SingleImageViewController: UIViewController {
 
     @IBOutlet private var imageView: UIImageView!
     @IBOutlet private weak var scrollView: UIScrollView!
-    
+
     private var hasAdjustedImageView = false
 
     // MARK: - Жизненный цикл
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         imageView.contentMode = .scaleAspectFit
@@ -39,7 +39,7 @@ final class SingleImageViewController: UIViewController {
     }
 
     // MARK: - Настройка ScrollView
-
+    
     private func setupScrollView() {
         scrollView.minimumZoomScale = 1.0
         scrollView.maximumZoomScale = 3.0
@@ -54,7 +54,7 @@ final class SingleImageViewController: UIViewController {
     }
 
     // MARK: - Загрузка изображения
-
+    
     private func loadImage() {
         imageView.image = nil
 
@@ -99,21 +99,8 @@ final class SingleImageViewController: UIViewController {
         centerImage()
     }
 
-    // MARK: - Функции кнопок
-
-    @IBAction func didTapShareButton(_ sender: Any) {
-        guard let image = imageView.image else { return }
-
-        let activityViewController = UIActivityViewController(activityItems: [image], applicationActivities: nil)
-        present(activityViewController, animated: true)
-    }
-
-    @IBAction func didTapBackButton(_ sender: Any) {
-        dismiss(animated: true, completion: nil)
-    }
-
     // MARK: - Центрирование изображения
-
+    
     private func centerImage() {
         let scrollViewSize = scrollView.bounds.size
         let imageViewSize = imageView.frame.size
@@ -129,8 +116,21 @@ final class SingleImageViewController: UIViewController {
         )
     }
     
-    // MARK: - Функция отображения ошибки
+    // MARK: - Функции кнопок
+    
+    @IBAction func didTapShareButton(_ sender: Any) {
+        guard let image = imageView.image else { return }
 
+        let activityViewController = UIActivityViewController(activityItems: [image], applicationActivities: nil)
+        present(activityViewController, animated: true)
+    }
+
+    @IBAction func didTapBackButton(_ sender: Any) {
+        dismiss(animated: true, completion: nil)
+    }
+
+    // MARK: - Функция отображения ошибки
+    
     private func showError() {
         let alert = UIAlertController(
             title: "Ошибка",

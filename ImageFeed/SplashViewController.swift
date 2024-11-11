@@ -2,10 +2,14 @@ import UIKit
 import ProgressHUD
 
 final class SplashViewController: UIViewController {
+    // MARK: - Свойства
+    
     private let imageView = UIImageView()
     private let oauth2TokenStorage = OAuth2TokenStorage.shared
     private let profileService = ProfileService.shared
     private let profileImageService = ProfileImageService.shared
+    
+    // MARK: - Жизненный цикл
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,20 +25,12 @@ final class SplashViewController: UIViewController {
         checkAuthorizationStatus()
     }
     
-    private func checkAuthorizationStatus() {
-        if let token = oauth2TokenStorage.token {
-            UIBlockingProgressHUD.show()
-            fetchProfile(token)
-        } else {
-            showAuthViewController()
-        }
-    }
-    
     override var preferredStatusBarStyle: UIStatusBarStyle {
         .lightContent
     }
     
-    // MARK: - Рисуем интерфейс
+    // MARK: - Настройка интерфейса
+    
     private func showSplashScreen() {
         view.backgroundColor = .ypBlack
         imageView.image = UIImage(named: "Image")
@@ -50,6 +46,16 @@ final class SplashViewController: UIViewController {
     }
     
     // MARK: - Функции
+    
+    private func checkAuthorizationStatus() {
+        if let token = oauth2TokenStorage.token {
+            UIBlockingProgressHUD.show()
+            fetchProfile(token)
+        } else {
+            showAuthViewController()
+        }
+    }
+    
     private func showAuthViewController() {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         guard let authViewController = storyboard.instantiateViewController(withIdentifier: "AuthViewController") as? AuthViewController else {
@@ -60,14 +66,12 @@ final class SplashViewController: UIViewController {
         present(authViewController, animated: true)
     }
     
-    
     private func switchToTabBarController() {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         guard let tabBarController = storyboard.instantiateViewController(withIdentifier: "TabBarViewController") as? TabBarController else {
             fatalError("Не удалось инициализировать TabBarController из Storyboard")
         }
         
-        // Плавный переход с анимацией
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
               let window = windowScene.windows.first else {
             fatalError("Не удалось получить UIWindow")
@@ -84,7 +88,6 @@ final class SplashViewController: UIViewController {
             
             switch result {
                 case .success(let profile):
-                    // Запускаем загрузку URL аватарки
                     self.profileImageService.fetchProfileImageURL(username: profile.username) { [weak self] profileImageResult in
                         guard let self = self else {
                             UIBlockingProgressHUD.dismiss()
@@ -96,9 +99,7 @@ final class SplashViewController: UIViewController {
                             case .failure(let error):
                                 print("[SplashViewController fetchProfile]: Не удалось получить ссылку на аватарку: \(error)")
                         }
-                        // Скрываем индикатор загрузки после завершения всех запросов
                         UIBlockingProgressHUD.dismiss()
-                        // Переходим на главный экран
                         DispatchQueue.main.async {
                             self.switchToTabBarController()
                         }
@@ -122,6 +123,8 @@ final class SplashViewController: UIViewController {
         present(alert, animated: true)
     }
 }
+
+// MARK: - Делегаты
 
 extension SplashViewController: AuthViewControllerDelegate {
     func didAuthenticate(_ vc: AuthViewController) {

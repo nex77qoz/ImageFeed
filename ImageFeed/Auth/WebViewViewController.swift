@@ -8,21 +8,34 @@
 import UIKit
 import WebKit
 
+// MARK: - Constants
+
 enum WebViewConstants {
     static let unsplashAuthorizeURLString = "https://unsplash.com/oauth/authorize"
 }
+
+// MARK: - Protocols
 
 protocol WebViewViewControllerDelegate: AnyObject {
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String)
     func webViewViewControllerDidCancel(_ vc: WebViewViewController)
 }
 
-final class WebViewViewController: UIViewController{
+// MARK: - WebViewViewController
+
+final class WebViewViewController: UIViewController {
+    
+    // MARK: - IBOutlets
+    
     @IBOutlet weak var webView: WKWebView!
     @IBOutlet weak var progressView: UIProgressView!
     
+    // MARK: - Properties
+    
     weak var delegate: WebViewViewControllerDelegate?
     private var estimatedProgressObservation: NSKeyValueObservation?
+    
+    // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -37,13 +50,18 @@ final class WebViewViewController: UIViewController{
                     })
         updateProgress()
     }
+    
     deinit {
         estimatedProgressObservation?.invalidate()
     }
     
+    // MARK: - Actions
+    
     @IBAction private func didTapBackButton(_ sender: Any?) {
         delegate?.webViewViewControllerDidCancel(self)
     }
+    
+    // MARK: - Private Methods
     
     private func updateProgress() {
         progressView.progress = Float(webView.estimatedProgress)
@@ -75,6 +93,8 @@ final class WebViewViewController: UIViewController{
     }
 }
 
+// MARK: - WKNavigationDelegate
+
 extension WebViewViewController: WKNavigationDelegate {
     func webView(
         _ webView: WKWebView,
@@ -88,6 +108,7 @@ extension WebViewViewController: WKNavigationDelegate {
             decisionHandler(.allow)
         }
     }
+    
     private func code(from navigationAction: WKNavigationAction) -> String? {
         if
             let url = navigationAction.request.url,
@@ -102,4 +123,3 @@ extension WebViewViewController: WKNavigationDelegate {
         }
     }
 }
-

@@ -11,12 +11,20 @@ final class SingleImageViewController: UIViewController {
             loadImage()
         }
     }
-
+    
+    var photo: Photo? {
+        didSet {
+            guard isViewLoaded, let photo = photo else { return }
+            imageURL = photo.largeImageURL
+        }
+    }
+    
+    
     @IBOutlet private var imageView: UIImageView!
     @IBOutlet private weak var scrollView: UIScrollView!
-
+    
     private var hasAdjustedImageView = false
-
+    
     // MARK: - Жизненный цикл
     
     override func viewDidLoad() {
@@ -26,7 +34,7 @@ final class SingleImageViewController: UIViewController {
         setupScrollView()
         loadImage()
     }
-
+    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         if hasAdjustedImageView {
@@ -37,7 +45,7 @@ final class SingleImageViewController: UIViewController {
             hasAdjustedImageView = true
         }
     }
-
+    
     // MARK: - Настройка ScrollView
     
     private func setupScrollView() {
@@ -52,16 +60,18 @@ final class SingleImageViewController: UIViewController {
             imageView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor)
         ])
     }
-
+    
     // MARK: - Загрузка изображения
     
     private func loadImage() {
         imageView.image = nil
 
-        guard let imageURLString = imageURL, let url = URL(string: imageURLString) else {
+        guard let photo = photo, let imageURLString = photo.largeImageURL, let url = URL(string: imageURLString) else {
             ProgressHUD.failed("Неверный URL изображения")
+            showError()
             return
         }
+        
         ProgressHUD.animate()
         imageView.kf.setImage(with: url, options: [.transition(.fade(0.2))]) { [weak self] result in
             ProgressHUD.dismiss()
@@ -73,7 +83,7 @@ final class SingleImageViewController: UIViewController {
                     self?.hasAdjustedImageView = false
                     self?.adjustImageView()
                 }
-            case .failure(_):
+            case .failure(let error):
                 self?.showError()
             }
         }
@@ -98,7 +108,7 @@ final class SingleImageViewController: UIViewController {
         
         centerImage()
     }
-
+    
     // MARK: - Центрирование изображения
     
     private func centerImage() {
@@ -107,7 +117,7 @@ final class SingleImageViewController: UIViewController {
         
         let horizontalInset = imageViewSize.width < scrollViewSize.width ? (scrollViewSize.width - imageViewSize.width) / 2 : 0
         let verticalInset = imageViewSize.height < scrollViewSize.height ? (scrollViewSize.height - imageViewSize.height) / 2 : 0
-
+        
         scrollView.contentInset = UIEdgeInsets(
             top: verticalInset,
             left: horizontalInset,
@@ -120,15 +130,15 @@ final class SingleImageViewController: UIViewController {
     
     @IBAction func didTapShareButton(_ sender: Any) {
         guard let image = imageView.image else { return }
-
+        
         let activityViewController = UIActivityViewController(activityItems: [image], applicationActivities: nil)
         present(activityViewController, animated: true)
     }
-
+    
     @IBAction func didTapBackButton(_ sender: Any) {
         dismiss(animated: true, completion: nil)
     }
-
+    
     // MARK: - Функция отображения ошибки
     
     private func showError() {
@@ -153,7 +163,7 @@ extension SingleImageViewController: UIScrollViewDelegate {
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
         return imageView
     }
-
+    
     func scrollViewDidZoom(_ scrollView: UIScrollView) {
         centerImage()
     }

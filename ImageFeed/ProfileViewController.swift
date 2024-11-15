@@ -1,15 +1,15 @@
 import UIKit
 import Kingfisher
 
-final class ProfileViewController: UIViewController {
+final class ProfileViewController: UIViewController, ProfileViewControllerProtocol {
     // MARK: - Properties
+    
+    var presenter: ProfileViewPresenterProtocol?
     
     private let imageView = UIImageView()
     private let nameLabel = UILabel()
     private let nicknameLabel = UILabel()
     private let profileDescription = UILabel()
-    private var profileImageServiceObserver: NSObjectProtocol?
-    private let oauth2TokenStorage = OAuth2TokenStorage.shared
     
     private var animationLayers = [CAGradientLayer]()
     private var gradientLayersAdded = false
@@ -19,20 +19,14 @@ final class ProfileViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupProfileView()
+        presenter?.viewDidLoad()
         
-        profileImageServiceObserver = NotificationCenter.default.addObserver(
-            forName: ProfileImageService.didChangeNotification, object: nil, queue: .main) { [weak self] _ in
-                guard let self = self else { return }
-                self.updateAvatar()
-            }
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(handleLogout),
             name: .didLogout,
             object: nil
         )
-        
-        updateProfileDetails()
     }
     
     deinit {
@@ -42,10 +36,7 @@ final class ProfileViewController: UIViewController {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         if !gradientLayersAdded {
-            addGradientLayer(to: imageView)
-            addGradientLayer(to: nameLabel)
-            addGradientLayer(to: nicknameLabel)
-            addGradientLayer(to: profileDescription)
+            addGradientLayers()
             gradientLayersAdded = true
         }
     }
@@ -54,18 +45,40 @@ final class ProfileViewController: UIViewController {
         .lightContent
     }
     
-    // MARK: - UI Setup
+    // MARK: - ProfileViewControllerProtocol
     
-    private func setupProfileView() {
-        showProfileImage()
-        showName()
-        showNicknameLabel()
-        showProfileDescription()
-        showExitButton()
-        view.backgroundColor = .ypBlack
+    func updateUI(with profile: Profile) {
+        nameLabel.text = profile.name
+        nicknameLabel.text = profile.loginName
+        profileDescription.text = profile.bio
+        
+        removeGradientLayers(from: [nameLabel, nicknameLabel, profileDescription])
+        presenter?.updateAvatar()
     }
     
-    private func showProfileImage() {
+    func updateAvatar(with url: URL) {
+        imageView.kf.setImage(with: url, completionHandler: { [weak self] result in
+            switch result {
+            case .success(_):
+                self?.removeGradientLayers(from: [self?.imageView].compactMap { $0 })
+            case .failure(let error):
+                print("Не удалось загрузить изображение: \(error)")
+            }
+        })
+    }
+    
+    // MARK: - Private Methods
+    
+    private func setupProfileView() {
+        view.backgroundColor = .ypBlack
+        setupImageView()
+        setupNameLabel()
+        setupNicknameLabel()
+        setupProfileDescription()
+        setupExitButton()
+    }
+    
+    private func setupImageView() {
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = 35
@@ -80,8 +93,7 @@ final class ProfileViewController: UIViewController {
         ])
     }
     
-    private func showName() {
-        nameLabel.text = ""
+    private func setupNameLabel() {
         nameLabel.textColor = .ypWhite
         nameLabel.font = .systemFont(ofSize: 18, weight: .bold)
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -94,8 +106,7 @@ final class ProfileViewController: UIViewController {
         ])
     }
     
-    private func showNicknameLabel() {
-        nicknameLabel.text = ""
+    private func setupNicknameLabel() {
         nicknameLabel.textColor = .ypGray
         nicknameLabel.font = .systemFont(ofSize: 13, weight: .regular)
         nicknameLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -108,8 +119,7 @@ final class ProfileViewController: UIViewController {
         ])
     }
     
-    private func showProfileDescription() {
-        profileDescription.text = ""
+    private func setupProfileDescription() {
         profileDescription.textColor = .ypWhite
         profileDescription.font = .systemFont(ofSize: 13, weight: .regular)
         profileDescription.translatesAutoresizingMaskIntoConstraints = false
@@ -122,11 +132,11 @@ final class ProfileViewController: UIViewController {
         ])
     }
     
-    private func showExitButton() {
+    private func setupExitButton() {
         guard let exitImage = UIImage(named: "Exit") else {
             fatalError("Не найдено изображение Exit")
         }
-        let button = UIButton.systemButton(with: exitImage, target: self, action: #selector(Self.didTapExitButton))
+        let button = UIButton.systemButton(with: exitImage, target: self, action: #selector(didTapExitButton))
         
         button.tintColor = .ypRed
         view.addSubview(button)
@@ -140,36 +150,11 @@ final class ProfileViewController: UIViewController {
         ])
     }
     
-    // MARK: - Actions
-
-    @objc
-    private func didTapExitButton() {
-        let alertController = UIAlertController(title: "Пока, пока!", message: "Уверены, что хотите выйти?", preferredStyle: .alert)
-        
-        let yesAction = UIAlertAction(title: "Да", style: .destructive) { [weak self] _ in
-            ProfileLogoutService.shared.logout()
-        }
-        
-        let noAction = UIAlertAction(title: "Нет", style: .cancel)
-        
-        alertController.addAction(yesAction)
-        alertController.addAction(noAction)
-        
-        present(alertController, animated: true)
-    }
-    
-    @objc
-    private func handleLogout() {
-        print("Выход из системы")
-        DispatchQueue.main.async {
-            let storyboard = UIStoryboard(name: "Main", bundle: nil)
-            guard let authVC = storyboard.instantiateViewController(withIdentifier: "AuthViewController") as? AuthViewController else { fatalError("AuthViewController не найден в Storyboard") }
-            authVC.modalPresentationStyle = .fullScreen
-            self.present(authVC, animated: true)
+    private func addGradientLayers() {
+        for view in [imageView, nameLabel, nicknameLabel, profileDescription] {
+            addGradientLayer(to: view)
         }
     }
-    
-    // MARK: - Private Methods
     
     private func addGradientLayer(to view: UIView) {
         let gradient = CAGradientLayer()
@@ -197,52 +182,48 @@ final class ProfileViewController: UIViewController {
         gradient.add(gradientChangeAnimation, forKey: "locationsChange")
     }
     
-    private func updateAvatar() {
-        if let url = URL(string: ProfileImageService.shared.avatarURL ?? "") {
-            imageView.kf.setImage(with: url, completionHandler: { [weak self] result in
-                switch result {
-                case .success(_):
-                    if let index = self?.animationLayers.firstIndex(where: { $0.superlayer == self?.imageView.layer }) {
-                        let gradientLayer = self?.animationLayers[index]
-                        gradientLayer?.removeFromSuperlayer()
-                        self?.animationLayers.remove(at: index)
-                    }
-                case .failure(let error):
-                    print("Не удалось загрузить изображение: \(error)")
-                }
-            })
-        }
-    }
-    
-    private func updateProfileDetails() {
-        guard let token = OAuth2TokenStorage.shared.token else {
-            print("[ProfileViewController updateProfileDetails]: Токен недоступен")
-            return
-        }
-        
-        ProfileService.shared.fetchProfile(token) { [weak self] result in
-            switch result {
-            case .success(let profile):
-                self?.updateUI(with: profile)
-            case .failure(let error):
-                print("[ProfileViewController updateProfileDetails]: Ошибка получения профиля: \(error)")
-            }
-        }
-    }
-    
-    private func updateUI(with profile: Profile) {
-        nameLabel.text = profile.name
-        nicknameLabel.text = profile.loginName
-        profileDescription.text = profile.bio
-        
-        for label in [nameLabel, nicknameLabel, profileDescription] {
-            if let index = animationLayers.firstIndex(where: { $0.superlayer == label.layer }) {
+    private func removeGradientLayers(from views: [UIView]) {
+        for view in views {
+            if let index = animationLayers.firstIndex(where: { $0.superlayer == view.layer }) {
                 let gradientLayer = animationLayers[index]
                 gradientLayer.removeFromSuperlayer()
                 animationLayers.remove(at: index)
             }
         }
+    }
+    
+    // MARK: - Actions
+    
+    @objc
+    private func didTapExitButton() {
+        let alertController = UIAlertController(
+            title: "Пока, пока!",
+            message: "Уверены, что хотите выйти?",
+            preferredStyle: .alert
+        )
         
-        updateAvatar()
+        let yesAction = UIAlertAction(title: "Да", style: .destructive) { [weak self] _ in
+            self?.presenter?.didTapLogoutButton()
+        }
+        
+        let noAction = UIAlertAction(title: "Нет", style: .cancel)
+        
+        alertController.addAction(yesAction)
+        alertController.addAction(noAction)
+        
+        present(alertController, animated: true)
+    }
+    
+    @objc
+    private func handleLogout() {
+        print("Выход из системы")
+        DispatchQueue.main.async {
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            guard let authVC = storyboard.instantiateViewController(withIdentifier: "AuthViewController") as? AuthViewController else {
+                fatalError("AuthViewController не найден в Storyboard")
+            }
+            authVC.modalPresentationStyle = .fullScreen
+            self.present(authVC, animated: true)
+        }
     }
 }

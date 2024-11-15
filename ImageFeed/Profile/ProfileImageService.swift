@@ -1,11 +1,3 @@
-//
-//  ProfileImageService.swift
-//  ImageFeed
-//
-//  Created by Максим Бабкин on 24.10.2024.
-//
-
-
 import Foundation
 
 final class ProfileImageService {

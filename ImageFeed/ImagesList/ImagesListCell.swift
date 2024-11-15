@@ -133,4 +133,43 @@ class ImagesListCell: UITableViewCell {
         super.layoutSubviews()
         gradientLayer?.frame = cellImage.bounds
     }
+    
+    func configCell(for photo: Photo, with placeholderImage: UIImage?) {
+        dateLabel.text = photo.createdAt?.description ?? ""
+        setIsLiked(photo.isLiked)
+        
+        cellImage.kf.indicatorType = .none  // Убираем индикатор загрузки
+        
+        // Запускаем анимацию градиента
+        addGradientAnimation()
+        
+        if let url = URL(string: photo.thumbImageURL) {
+            cellImage.kf.setImage(
+                with: url,
+                placeholder: placeholderImage,
+                options: [
+                    .transition(.fade(0.3)),
+                    .cacheOriginalImage
+                ]) { result in
+                    DispatchQueue.main.async {
+                        // Удаляем анимацию градиента
+                        self.removeGradientAnimation()
+                        switch result {
+                        case .success(_):
+                            // Изображение успешно загружено
+                            self.cellImage.contentMode = .scaleAspectFill
+                        case .failure(_):
+                            // Ошибка загрузки, устанавливаем плейсхолдер
+                            self.cellImage.image = placeholderImage
+                            self.cellImage.contentMode = .center
+                        }
+                    }
+                }
+        } else {
+            // Недействительный URL, удаляем анимацию и устанавливаем плейсхолдер
+            removeGradientAnimation()
+            cellImage.image = placeholderImage
+            cellImage.contentMode = .center
+        }
+    }
 }

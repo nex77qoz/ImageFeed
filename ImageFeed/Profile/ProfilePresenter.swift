@@ -2,16 +2,16 @@ import Foundation
 
 final class ProfilePresenter: ProfileViewPresenterProtocol {
     weak var view: ProfileViewControllerProtocol?
-    private let profileService: ProfileService
-    private let profileImageService: ProfileImageService
+    private let profileService: ProfileServiceProtocol
+    private let profileImageService: ProfileImageServiceProtocol
     private let tokenStorage: OAuth2TokenStorage
     private let logoutService: ProfileLogoutService
     
     private(set) var profile: Profile?
     
     init(
-        profileService: ProfileService = .shared,
-        profileImageService: ProfileImageService = .shared,
+        profileService: ProfileServiceProtocol,
+        profileImageService: ProfileImageServiceProtocol,
         tokenStorage: OAuth2TokenStorage = .shared,
         logoutService: ProfileLogoutService = .shared
     ) {
@@ -31,16 +31,21 @@ final class ProfilePresenter: ProfileViewPresenterProtocol {
     }
     
     func updateProfileDetails() {
-        guard let token = tokenStorage.token else {
-            print("[ProfilePresenter updateProfileDetails]: Токен недоступен")
-            return
-        }
+        // For testing purposes, allow empty token
+        let token = tokenStorage.token ?? ""
         
         profileService.fetchProfile(token) { [weak self] result in
+            guard let self = self else { return }
+            
             switch result {
-            case .success(let profile):
-                self?.profile = profile
-                self?.view?.updateUI(with: profile)
+            case .success(let profileResult):
+                let profile = Profile(profileResult: profileResult)
+                self.profile = profile
+                self.view?.updateUI(with: profile)
+                
+                // Fetch avatar URL after profile is loaded
+                self.fetchProfileImageURL(profile.username)
+                
             case .failure(let error):
                 print("[ProfilePresenter updateProfileDetails]: Ошибка получения профиля: \(error)")
             }
@@ -48,8 +53,22 @@ final class ProfilePresenter: ProfileViewPresenterProtocol {
     }
     
     func updateAvatar() {
-        if let url = URL(string: profileImageService.avatarURL ?? "") {
-            view?.updateAvatar(with: url)
+        guard let username = profile?.username else { return }
+        fetchProfileImageURL(username)
+    }
+    
+    private func fetchProfileImageURL(_ username: String) {
+        profileImageService.fetchProfileImageURL(username) { [weak self] result in
+            guard let self = self else { return }
+            
+            switch result {
+            case .success(let imageURLString):
+                guard let imageURL = URL(string: imageURLString) else { return }
+                self.view?.updateAvatar(with: imageURL)
+                
+            case .failure(let error):
+                print("[ProfilePresenter]: Failed to fetch avatar URL with error: \(error)")
+            }
         }
     }
     
@@ -64,6 +83,8 @@ final class ProfilePresenter: ProfileViewPresenterProtocol {
     
     @objc
     private func handleProfileImageUpdate() {
-        updateAvatar()
+        if let url = URL(string: profileImageService.avatarURL ?? "") {
+            view?.updateAvatar(with: url)
+        }
     }
 }

@@ -81,7 +81,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		75577C742CE5349300422772 /* WebViewTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = WebViewTests; sourceTree = "<group>"; };
+		75577C742CE5349300422772 /* Tests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Tests; sourceTree = "<group>"; };
 		75577CF82CE7D05500422772 /* Profile */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Profile; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
@@ -129,7 +129,7 @@
 			isa = PBXGroup;
 			children = (
 				753A4C652C88E1DD004FD659 /* ImageFeed */,
-				75577C742CE5349300422772 /* WebViewTests */,
+				75577C742CE5349300422772 /* Tests */,
 				753A4C642C88E1DD004FD659 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -216,7 +216,7 @@
 				75577C782CE5349300422772 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				75577C742CE5349300422772 /* WebViewTests */,
+				75577C742CE5349300422772 /* Tests */,
 			);
 			name = WebViewTests;
 			packageProductDependencies = (

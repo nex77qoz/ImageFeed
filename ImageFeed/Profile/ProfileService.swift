@@ -15,7 +15,7 @@ final class ProfileService {
     
     // MARK: - Public Methods
     
-    func fetchProfile(_ token: String, completion: @escaping (Result<Profile, Error>) -> Void) {
+    func fetchProfile(_ token: String, completion: @escaping (Result<ProfileResult, Error>) -> Void) {
         assert(Thread.isMainThread)
         task?.cancel()
         
@@ -25,19 +25,15 @@ final class ProfileService {
             return
         }
         
-        let task = urlSession.objectTask(for: request) { [weak self] (result: Result<ProfileResult, Error>) in
+        let task = urlSession.objectTask(for: request) { (result: Result<ProfileResult, Error>) in
             DispatchQueue.main.async {
-                guard let self = self else { return }
-                self.task = nil
-                
                 switch result {
-                    case .success(let profileResult):
-                        let profile = Profile(profileResult: profileResult)
-                        self.profile = profile
-                        completion(.success(profile))
-                    case .failure(let error):
-                        print("[ProfileService fetchProfile]: Ошибка - \(error.localizedDescription)")
-                        completion(.failure(error))
+                case .success(let profileResult):
+                    print("[ProfileService fetchProfile]: Успешно загружен профиль")
+                    completion(.success(profileResult))
+                case .failure(let error):
+                    print("[ProfileService fetchProfile]: Ошибка - \(error.localizedDescription)")
+                    completion(.failure(error))
                 }
             }
         }
@@ -61,37 +57,5 @@ final class ProfileService {
         request.httpMethod = "GET"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         return request
-    }
-}
-
-// MARK: - Models
-
-struct ProfileResult: Codable {
-    let username: String
-    let firstName: String
-    let lastName: String?
-    let bio: String?
-    
-    enum CodingKeys: String, CodingKey {
-        case username
-        case firstName = "first_name"
-        case lastName = "last_name"
-        case bio
-    }
-}
-
-struct Profile {
-    let username: String
-    let name: String
-    let loginName: String
-    let bio: String?
-    
-    init(profileResult: ProfileResult) {
-        self.username = profileResult.username
-        let firstName = profileResult.firstName
-        let lastName = profileResult.lastName ?? ""
-        self.name = "\(firstName) \(lastName)".trimmingCharacters(in: .whitespaces)
-        self.loginName = "@\(profileResult.username)"
-        self.bio = profileResult.bio
     }
 }

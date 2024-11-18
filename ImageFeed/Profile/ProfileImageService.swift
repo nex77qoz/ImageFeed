@@ -46,18 +46,18 @@ final class ProfileImageService: ProfileImageServiceProtocol {
                 self.lastUsername = nil
                 
                 switch result {
-                case .success(let userResult):
-                    let avatarURL = userResult.profileImage.small
-                    self.avatarURL = avatarURL
-                    completion(.success(avatarURL))
-                    NotificationCenter.default.post(
-                        name: ProfileImageService.didChangeNotification,
-                        object: self,
-                        userInfo: ["URL": avatarURL]
-                    )
-                case .failure(let error):
-                    print("[ProfileImageService fetchProfileImageURL]: Ошибка - \(error.localizedDescription)")
-                    completion(.failure(error))
+                    case .success(let userResult):
+                        let avatarURL = userResult.profileImage.small
+                        self.avatarURL = avatarURL
+                        completion(.success(avatarURL))
+                        NotificationCenter.default.post(
+                            name: ProfileImageService.didChangeNotification,
+                            object: self,
+                            userInfo: ["URL": avatarURL]
+                        )
+                    case .failure(let error):
+                        print("[ProfileImageService fetchProfileImageURL]: Ошибка - \(error.localizedDescription)")
+                        completion(.failure(error))
                 }
             }
         }

@@ -22,17 +22,17 @@ public protocol WebViewViewControllerProtocol: AnyObject {
 final class WebViewViewController: UIViewController, WebViewViewControllerProtocol {
     
     var presenter: WebViewPresenterProtocol?
-
+    
     @IBOutlet private var webView: WKWebView!
     @IBOutlet private var progressView: UIProgressView!
-
+    
     weak var delegate: WebViewViewControllerDelegate?
     
     // MARK: - Lifecycle
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         webView.navigationDelegate = self
         
         presenter?.viewDidLoad()
@@ -46,7 +46,7 @@ final class WebViewViewController: UIViewController, WebViewViewControllerProtoc
             options: .new,
             context: nil)
     }
-
+    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         webView.removeObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress), context: nil)
@@ -61,17 +61,17 @@ final class WebViewViewController: UIViewController, WebViewViewControllerProtoc
             super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
         }
     }
-
+    
     // MARK: - Public Methods
     
     func load(request: URLRequest) {
         webView.load(request)
     }
-
+    
     func setProgressValue(_ newValue: Float) {
         progressView.progress = newValue
     }
-
+    
     func setProgressHidden(_ isHidden: Bool) {
         progressView.isHidden = isHidden
     }
@@ -92,7 +92,7 @@ extension WebViewViewController: WKNavigationDelegate {
             decisionHandler(.allow)
         }
     }
-
+    
     private func code(from navigationAction: WKNavigationAction) -> String? {
         if let url = navigationAction.request.url {
             return presenter?.code(from: url)

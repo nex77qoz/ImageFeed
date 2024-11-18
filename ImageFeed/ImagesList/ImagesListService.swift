@@ -80,7 +80,7 @@ final class ImagesListService: ImagesListServiceProtocol {
     
     private let urlSession = URLSession.shared
     private var task: URLSessionTask?
-    private let dateFormatter: ISO8601DateFormatter = {
+    private let iso8601DateFormatter: ISO8601DateFormatter = {
         let formatter = ISO8601DateFormatter()
         return formatter
     }()
@@ -182,11 +182,12 @@ final class ImagesListService: ImagesListServiceProtocol {
         let width = CGFloat(photoResult.width)
         let height = CGFloat(photoResult.height)
         let size = CGSize(width: width, height: height)
-        let createdAt = photoResult.createdAt.flatMap { dateFormatter.date(from: $0) }
+        let createdAt = photoResult.createdAt.flatMap { iso8601DateFormatter.date(from: $0) }
         let description = photoResult.description
         let thumbImageURL = photoResult.urls.regular
         let largeImageURL = photoResult.urls.full
         let isLiked = photoResult.likedByUser
+        
         return Photo(
             id: id,
             size: size,

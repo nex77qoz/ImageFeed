@@ -26,7 +26,7 @@ final class AuthViewController: UIViewController {
     }
     
     // MARK: - Navigation
-
+    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == showWebViewSegueIdentifier {
             guard let webViewViewController = segue.destination as? WebViewViewController else {
@@ -44,7 +44,7 @@ final class AuthViewController: UIViewController {
     }
     
     // MARK: - Private Methods
-
+    
     private func configureBackButton() {
         navigationController?.navigationBar.backIndicatorImage = UIImage(named: "Backward")
         navigationController?.navigationBar.backIndicatorTransitionMaskImage = UIImage(named: "Backward")
@@ -63,17 +63,17 @@ extension AuthViewController: WebViewViewControllerDelegate {
             UIBlockingProgressHUD.dismiss()
             
             switch result {
-            case .success:
-                self.delegate?.didAuthenticate(self)
-            case .failure:
-                let alert = UIAlertController(
-                    title: "Что-то пошло не так(",
-                    message: "Не удалось войти в систему",
-                    preferredStyle: .alert
-                )
-                let action = UIAlertAction(title: "Ок", style: .default)
-                alert.addAction(action)
-                self.present(alert, animated: true)
+                case .success:
+                    self.delegate?.didAuthenticate(self)
+                case .failure:
+                    let alert = UIAlertController(
+                        title: "Что-то пошло не так(",
+                        message: "Не удалось войти в систему",
+                        preferredStyle: .alert
+                    )
+                    let action = UIAlertAction(title: "Ок", style: .default)
+                    alert.addAction(action)
+                    self.present(alert, animated: true)
             }
         }
     }

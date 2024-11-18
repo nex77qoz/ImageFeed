@@ -58,18 +58,18 @@ extension URLSession {
     ) -> URLSessionTask {
         let task = dataTask(for: request) { (result: Result<Data, Error>) in
             switch result {
-            case .success(let data):
-                do {
-                    let decoder = JSONDecoder()
-                    let decodedObject = try decoder.decode(T.self, from: data)
-                    completion(.success(decodedObject))
-                } catch {
-                    print("[objectTask]: NetworkError.decodingError - \(error.localizedDescription), Данные: \(String(data: data, encoding: .utf8) ?? "")")
-                    completion(.failure(NetworkError.decodingError(error)))
-                }
-            case .failure(let error):
-                print("[objectTask]: Error - \(error.localizedDescription)")
-                completion(.failure(error))
+                case .success(let data):
+                    do {
+                        let decoder = JSONDecoder()
+                        let decodedObject = try decoder.decode(T.self, from: data)
+                        completion(.success(decodedObject))
+                    } catch {
+                        print("[objectTask]: NetworkError.decodingError - \(error.localizedDescription), Данные: \(String(data: data, encoding: .utf8) ?? "")")
+                        completion(.failure(NetworkError.decodingError(error)))
+                    }
+                case .failure(let error):
+                    print("[objectTask]: Error - \(error.localizedDescription)")
+                    completion(.failure(error))
             }
         }
         return task

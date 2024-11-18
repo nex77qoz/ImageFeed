@@ -52,14 +52,14 @@ final class ProfilePresenter: ProfileViewPresenterProtocol {
             guard let self = self else { return }
             
             switch result {
-            case .success(let profileResult):
-                let profile = Profile(profileResult: profileResult)
-                self.profile = profile
-                self.view?.updateUI(with: profile)
-                self.fetchProfileImageURL(profile.username)
-                
-            case .failure(let error):
-                print("[ProfilePresenter updateProfileDetails]: Ошибка получения профиля: \(error)")
+                case .success(let profileResult):
+                    let profile = Profile(profileResult: profileResult)
+                    self.profile = profile
+                    self.view?.updateUI(with: profile)
+                    self.fetchProfileImageURL(profile.username)
+                    
+                case .failure(let error):
+                    print("[ProfilePresenter updateProfileDetails]: Ошибка получения профиля: \(error)")
             }
         }
     }
@@ -78,12 +78,12 @@ final class ProfilePresenter: ProfileViewPresenterProtocol {
             guard let self = self else { return }
             
             switch result {
-            case .success(let imageURLString):
-                guard let imageURL = URL(string: imageURLString) else { return }
-                self.view?.updateAvatar(with: imageURL)
-                
-            case .failure(let error):
-                print("[ProfilePresenter]: Failed to fetch avatar URL with error: \(error)")
+                case .success(let imageURLString):
+                    guard let imageURL = URL(string: imageURLString) else { return }
+                    self.view?.updateAvatar(with: imageURL)
+                    
+                case .failure(let error):
+                    print("[ProfilePresenter]: Failed to fetch avatar URL with error: \(error)")
             }
         }
     }

@@ -33,12 +33,12 @@ final class ProfileService: ProfileServiceProtocol {
         let task = urlSession.objectTask(for: request) { (result: Result<ProfileResult, Error>) in
             DispatchQueue.main.async {
                 switch result {
-                case .success(let profileResult):
-                    print("[ProfileService fetchProfile]: Успешно загружен профиль")
-                    completion(.success(profileResult))
-                case .failure(let error):
-                    print("[ProfileService fetchProfile]: Ошибка - \(error.localizedDescription)")
-                    completion(.failure(error))
+                    case .success(let profileResult):
+                        print("[ProfileService fetchProfile]: Успешно загружен профиль")
+                        completion(.success(profileResult))
+                    case .failure(let error):
+                        print("[ProfileService fetchProfile]: Ошибка - \(error.localizedDescription)")
+                        completion(.failure(error))
                 }
             }
         }

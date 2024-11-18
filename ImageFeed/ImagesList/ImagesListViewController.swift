@@ -11,10 +11,6 @@ final class ImagesListViewController: UIViewController {
     // MARK: Properties
     
     private let presenter = ImagesListPresenter()
-    private let dateFormatter: ISO8601DateFormatter = {
-        let formatter = ISO8601DateFormatter()
-        return formatter
-    }()
     
     // MARK: Lifecycle
     

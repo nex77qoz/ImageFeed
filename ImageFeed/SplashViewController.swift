@@ -29,7 +29,7 @@ final class SplashViewController: UIViewController {
     }
     
     // MARK: - Status Bar Style
-
+    
     override var preferredStatusBarStyle: UIStatusBarStyle {
         .lightContent
     }
@@ -92,28 +92,28 @@ final class SplashViewController: UIViewController {
             }
             
             switch result {
-            case .success(let profile):
-                self.fetchProfileImage(for: profile.username) {
-                    UIBlockingProgressHUD.dismiss()
-                    DispatchQueue.main.async {
-                        self.switchToTabBarController()
+                case .success(let profile):
+                    self.fetchProfileImage(for: profile.username) {
+                        UIBlockingProgressHUD.dismiss()
+                        DispatchQueue.main.async {
+                            self.switchToTabBarController()
+                        }
                     }
-                }
-            case .failure(let error):
-                print("[SplashViewController fetchProfile]: Загрузка профиля завершилась с ошибкой: \(error)")
-                UIBlockingProgressHUD.dismiss()
-                self.showError(error)
+                case .failure(let error):
+                    print("[SplashViewController fetchProfile]: Загрузка профиля завершилась с ошибкой: \(error)")
+                    UIBlockingProgressHUD.dismiss()
+                    self.showError(error)
             }
         }
     }
-
+    
     private func fetchProfileImage(for username: String, completion: @escaping () -> Void) {
         profileImageService.fetchProfileImageURL(username) { profileImageResult in
             switch profileImageResult {
-            case .success(let imageURL):
-                print("Ссылка на аватарку: \(imageURL)")
-            case .failure(let error):
-                print("[SplashViewController fetchProfile]: Не удалось получить ссылку на аватарку: \(error)")
+                case .success(let imageURL):
+                    print("Ссылка на аватарку: \(imageURL)")
+                case .failure(let error):
+                    print("[SplashViewController fetchProfile]: Не удалось получить ссылку на аватарку: \(error)")
             }
             completion()
         }

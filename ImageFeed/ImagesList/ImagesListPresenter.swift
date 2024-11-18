@@ -30,10 +30,6 @@ class ImagesListPresenter {
     
     private var photos: [Photo] = []
     private let showSingleImageSegueIdentifier = "ShowSingleImage"
-    private let dateFormatter: ISO8601DateFormatter = {
-        let formatter = ISO8601DateFormatter()
-        return formatter
-    }()
     
     // MARK: Placeholder Image
     
@@ -125,18 +121,18 @@ class ImagesListPresenter {
             guard let self = self else { return }
             DispatchQueue.main.async {
                 switch result {
-                case .success:
-                    self.photos[indexPath.row].isLiked = isLiked
-                    NotificationCenter.default.post(
-                        name: ImagesListService.didChangeNotification,
-                        object: self,
-                        userInfo: ["index": indexPath.row]
-                    )
-                    UIBlockingProgressHUD.dismiss()
-                case .failure(let error):
-                    UIBlockingProgressHUD.dismiss()
-                    self.delegate?.showErrorAlert(with: error.localizedDescription)
-                    print("Ошибка установки лайка: \(error)")
+                    case .success:
+                        self.photos[indexPath.row].isLiked = isLiked
+                        NotificationCenter.default.post(
+                            name: ImagesListService.didChangeNotification,
+                            object: self,
+                            userInfo: ["index": indexPath.row]
+                        )
+                        UIBlockingProgressHUD.dismiss()
+                    case .failure(let error):
+                        UIBlockingProgressHUD.dismiss()
+                        self.delegate?.showErrorAlert(with: error.localizedDescription)
+                        print("Ошибка установки лайка: \(error)")
                 }
             }
         }

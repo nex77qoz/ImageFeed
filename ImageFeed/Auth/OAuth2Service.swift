@@ -52,12 +52,12 @@ final class OAuth2Service {
                 self.lastCode = nil
                 
                 switch result {
-                case .success(let body):
-                    OAuth2TokenStorage.shared.token = body.accessToken
-                    completion(.success(body.accessToken))
-                case .failure(let error):
-                    print("[OAuth2Service fetchOAuthToken]: Ошибка - \(error.localizedDescription)")
-                    completion(.failure(error))
+                    case .success(let body):
+                        OAuth2TokenStorage.shared.token = body.accessToken
+                        completion(.success(body.accessToken))
+                    case .failure(let error):
+                        print("[OAuth2Service fetchOAuthToken]: Ошибка - \(error.localizedDescription)")
+                        completion(.failure(error))
                 }
             }
         }
@@ -66,9 +66,9 @@ final class OAuth2Service {
         task.resume()
     }
     
-
+    
     // MARK: - Private Methods
-
+    
     private func makeOAuthTokenRequest(code: String) -> URLRequest? {
         var components = URLComponents(string: "https://unsplash.com/oauth/token")
         

@@ -31,9 +31,9 @@ struct UrlsResult: Decodable {
     let thumb: String
 }
 
+// MARK: - Photo Model
+
 class Photo {
-    // MARK: - Properties
-    
     let id: String
     let size: CGSize
     let createdAt: Date?
@@ -41,8 +41,6 @@ class Photo {
     let thumbImageURL: String
     let largeImageURL: String?
     var isLiked: Bool
-    
-    // MARK: - Initializer
     
     init(id: String, size: CGSize, createdAt: Date?, welcomeDescription: String?, thumbImageURL: String, largeImageURL: String, isLiked: Bool) {
         self.id = id
@@ -63,11 +61,9 @@ protocol ImagesListServiceProtocol {
     func changeLike(photoId: String, isLike: Bool, completion: @escaping (Result<Void, Error>) -> Void)
 }
 
-extension ImagesListService: ImagesListServiceProtocol {
-    
-}
+// MARK: - ImagesListService
 
-final class ImagesListService {
+final class ImagesListService: ImagesListServiceProtocol {
     // MARK: - Singleton
     
     internal static var shared = ImagesListService()

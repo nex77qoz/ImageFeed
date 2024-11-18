@@ -1,16 +1,28 @@
 import Foundation
 
-final class ProfileImageService {
+// MARK: - Profile Image Service
+
+final class ProfileImageService: ProfileImageServiceProtocol {
+    
+    // MARK: - Singleton
+    
     static let shared = ProfileImageService()
     static let didChangeNotification = Notification.Name(rawValue: "ProfileImageProviderDidChange")
+    
+    // MARK: - Initialization
+    
     private init() {}
+    
+    // MARK: - Properties
     
     private let urlSession = URLSession.shared
     private var task: URLSessionTask?
     private var lastUsername: String?
     private(set) var avatarURL: String?
     
-    func fetchProfileImageURL(username: String, _ completion: @escaping (Result<String, Error>) -> Void) {
+    // MARK: - Fetch Profile Image URL
+    
+    func fetchProfileImageURL(_ username: String, completion: @escaping (Result<String, Error>) -> Void) {
         assert(Thread.isMainThread)
         
         if lastUsername == username, let existingURL = avatarURL {
@@ -34,18 +46,18 @@ final class ProfileImageService {
                 self.lastUsername = nil
                 
                 switch result {
-                    case .success(let userResult):
-                        let avatarURL = userResult.profileImage.small
-                        self.avatarURL = avatarURL
-                        completion(.success(avatarURL))
-                        NotificationCenter.default.post(
-                            name: ProfileImageService.didChangeNotification,
-                            object: self,
-                            userInfo: ["URL": avatarURL]
-                        )
-                    case .failure(let error):
-                        print("[ProfileImageService fetchProfileImageURL]: Ошибка - \(error.localizedDescription)")
-                        completion(.failure(error))
+                case .success(let userResult):
+                    let avatarURL = userResult.profileImage.small
+                    self.avatarURL = avatarURL
+                    completion(.success(avatarURL))
+                    NotificationCenter.default.post(
+                        name: ProfileImageService.didChangeNotification,
+                        object: self,
+                        userInfo: ["URL": avatarURL]
+                    )
+                case .failure(let error):
+                    print("[ProfileImageService fetchProfileImageURL]: Ошибка - \(error.localizedDescription)")
+                    completion(.failure(error))
                 }
             }
         }
@@ -53,10 +65,14 @@ final class ProfileImageService {
         task.resume()
     }
     
+    // MARK: - Reset Avatar URL
+    
     func resetAvatarURL() {
         self.avatarURL = nil
         NotificationCenter.default.post(name: ProfileImageService.didChangeNotification, object: nil)
     }
+    
+    // MARK: - Make Request
     
     private func makeRequest(username: String) -> URLRequest? {
         guard let url = URL(string: "https://api.unsplash.com/users/\(username)") else {
@@ -73,12 +89,16 @@ final class ProfileImageService {
     }
 }
 
+// MARK: - User Result
+
 struct UserResult: Codable {
     let profileImage: ProfileImage
     
     enum CodingKeys: String, CodingKey {
         case profileImage = "profile_image"
     }
+    
+    // MARK: - Profile Image
     
     struct ProfileImage: Codable {
         let small: String

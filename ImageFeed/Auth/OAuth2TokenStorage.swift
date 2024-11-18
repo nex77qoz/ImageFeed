@@ -1,21 +1,24 @@
-//
-//  OAuth2TokenStorage.swift
-//  ImageFeed
-//
-//  Created by Максим Бабкин on 01.10.2024.
-//
-
 import Foundation
 import SwiftKeychainWrapper
 
+// MARK: - OAuth2TokenStorage
+
 final class OAuth2TokenStorage {
+    // MARK: Shared Instance
+    
     static let shared = OAuth2TokenStorage()
+    
+    // MARK: Private Keys
     
     private enum Keys {
         static let bearerToken = "bearerToken"
     }
     
+    // MARK: Initialization
+    
     private init() {}
+    
+    // MARK: Token Storage
     
     var token: String? {
         get {

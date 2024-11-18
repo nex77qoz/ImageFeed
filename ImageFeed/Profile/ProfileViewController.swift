@@ -1,26 +1,29 @@
 import UIKit
 import Kingfisher
 
+// MARK: - ProfileViewController
+
 final class ProfileViewController: UIViewController, ProfileViewControllerProtocol {
-    // MARK: - Properties
-    
+
+    // MARK: Properties
+
     var presenter: ProfileViewPresenterProtocol?
-    
+
     private let imageView = UIImageView()
     private let nameLabel = UILabel()
     private let nicknameLabel = UILabel()
     private let profileDescription = UILabel()
-    
+
     private var animationLayers = [CAGradientLayer]()
     private var gradientLayersAdded = false
-    
-    // MARK: - Lifecycle
-    
+
+    // MARK: Lifecycle
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setupProfileView()
         presenter?.viewDidLoad()
-        
+
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(handleLogout),
@@ -28,11 +31,11 @@ final class ProfileViewController: UIViewController, ProfileViewControllerProtoc
             object: nil
         )
     }
-    
+
     deinit {
         NotificationCenter.default.removeObserver(self, name: .didLogout, object: nil)
     }
-    
+
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         if !gradientLayersAdded {
@@ -40,22 +43,22 @@ final class ProfileViewController: UIViewController, ProfileViewControllerProtoc
             gradientLayersAdded = true
         }
     }
-    
+
     override var preferredStatusBarStyle: UIStatusBarStyle {
         .lightContent
     }
-    
-    // MARK: - ProfileViewControllerProtocol
-    
+
+    // MARK: ProfileViewControllerProtocol
+
     func updateUI(with profile: Profile) {
         nameLabel.text = profile.name
         nicknameLabel.text = profile.loginName
         profileDescription.text = profile.bio
-        
+
         removeGradientLayers(from: [nameLabel, nicknameLabel, profileDescription])
         presenter?.updateAvatar()
     }
-    
+
     func updateAvatar(with url: URL) {
         imageView.kf.setImage(with: url, completionHandler: { [weak self] result in
             switch result {
@@ -66,9 +69,9 @@ final class ProfileViewController: UIViewController, ProfileViewControllerProtoc
             }
         })
     }
-    
-    // MARK: - Private Methods
-    
+
+    // MARK: Private Methods
+
     private func setupProfileView() {
         view.backgroundColor = .ypBlack
         setupImageView()
@@ -77,14 +80,14 @@ final class ProfileViewController: UIViewController, ProfileViewControllerProtoc
         setupProfileDescription()
         setupExitButton()
     }
-    
+
     private func setupImageView() {
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = 35
         imageView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(imageView)
-        
+
         NSLayoutConstraint.activate([
             imageView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
             imageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 32),
@@ -92,56 +95,56 @@ final class ProfileViewController: UIViewController, ProfileViewControllerProtoc
             imageView.heightAnchor.constraint(equalToConstant: 70)
         ])
     }
-    
+
     private func setupNameLabel() {
         nameLabel.textColor = .ypWhite
         nameLabel.font = .systemFont(ofSize: 18, weight: .bold)
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(nameLabel)
-        
+
         NSLayoutConstraint.activate([
             nameLabel.leadingAnchor.constraint(equalTo: imageView.leadingAnchor),
             nameLabel.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 8),
             nameLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -24)
         ])
     }
-    
+
     private func setupNicknameLabel() {
         nicknameLabel.textColor = .ypGray
         nicknameLabel.font = .systemFont(ofSize: 13, weight: .regular)
         nicknameLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(nicknameLabel)
-        
+
         NSLayoutConstraint.activate([
             nicknameLabel.leadingAnchor.constraint(equalTo: imageView.leadingAnchor),
             nicknameLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 8),
             nicknameLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -24)
         ])
     }
-    
+
     private func setupProfileDescription() {
         profileDescription.textColor = .ypWhite
         profileDescription.font = .systemFont(ofSize: 13, weight: .regular)
         profileDescription.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(profileDescription)
-        
+
         NSLayoutConstraint.activate([
             profileDescription.leadingAnchor.constraint(equalTo: imageView.leadingAnchor),
             profileDescription.topAnchor.constraint(equalTo: nicknameLabel.bottomAnchor, constant: 8),
             profileDescription.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -24)
         ])
     }
-    
+
     private func setupExitButton() {
         guard let exitImage = UIImage(named: "Exit") else {
             fatalError("Не найдено изображение Exit")
         }
         let button = UIButton.systemButton(with: exitImage, target: self, action: #selector(didTapExitButton))
-        
+
         button.tintColor = .ypRed
         view.addSubview(button)
         button.translatesAutoresizingMaskIntoConstraints = false
-        
+
         NSLayoutConstraint.activate([
             button.heightAnchor.constraint(equalToConstant: 24),
             button.widthAnchor.constraint(equalToConstant: 24),
@@ -149,13 +152,13 @@ final class ProfileViewController: UIViewController, ProfileViewControllerProtoc
             button.centerYAnchor.constraint(equalTo: imageView.centerYAnchor)
         ])
     }
-    
+
     private func addGradientLayers() {
         for view in [imageView, nameLabel, nicknameLabel, profileDescription] {
             addGradientLayer(to: view)
         }
     }
-    
+
     private func addGradientLayer(to view: UIView) {
         let gradient = CAGradientLayer()
         gradient.frame = view.bounds
@@ -173,7 +176,7 @@ final class ProfileViewController: UIViewController, ProfileViewControllerProtoc
         }
         view.layer.addSublayer(gradient)
         animationLayers.append(gradient)
-        
+
         let gradientChangeAnimation = CABasicAnimation(keyPath: "locations")
         gradientChangeAnimation.duration = 1.0
         gradientChangeAnimation.repeatCount = .infinity
@@ -181,7 +184,7 @@ final class ProfileViewController: UIViewController, ProfileViewControllerProtoc
         gradientChangeAnimation.toValue = [0, 0.8, 1]
         gradient.add(gradientChangeAnimation, forKey: "locationsChange")
     }
-    
+
     private func removeGradientLayers(from views: [UIView]) {
         for view in views {
             if let index = animationLayers.firstIndex(where: { $0.superlayer == view.layer }) {
@@ -191,9 +194,9 @@ final class ProfileViewController: UIViewController, ProfileViewControllerProtoc
             }
         }
     }
-    
-    // MARK: - Actions
-    
+
+    // MARK: Actions
+
     @objc
     private func didTapExitButton() {
         let alertController = UIAlertController(
@@ -201,19 +204,19 @@ final class ProfileViewController: UIViewController, ProfileViewControllerProtoc
             message: "Уверены, что хотите выйти?",
             preferredStyle: .alert
         )
-        
+
         let yesAction = UIAlertAction(title: "Да", style: .destructive) { [weak self] _ in
             self?.presenter?.didTapLogoutButton()
         }
-        
+
         let noAction = UIAlertAction(title: "Нет", style: .cancel)
-        
+
         alertController.addAction(yesAction)
         alertController.addAction(noAction)
-        
+
         present(alertController, animated: true)
     }
-    
+
     @objc
     private func handleLogout() {
         print("Выход из системы")

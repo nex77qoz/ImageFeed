@@ -1,14 +1,22 @@
 import UIKit
 import Kingfisher
 
+// MARK: - ImagesListViewController
+
 final class ImagesListViewController: UIViewController {
+    // MARK: Outlets
+    
     @IBOutlet weak var tableView: UITableView!
+    
+    // MARK: Properties
     
     private let presenter = ImagesListPresenter()
     private let dateFormatter: ISO8601DateFormatter = {
         let formatter = ISO8601DateFormatter()
         return formatter
     }()
+    
+    // MARK: Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -23,7 +31,30 @@ final class ImagesListViewController: UIViewController {
         
         presenter.delegate = self
         presenter.viewDidLoad()
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(updateCell(_:)),
+            name: ImagesListService.didChangeNotification,
+            object: presenter
+        )
     }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    @objc private func updateCell(_ notification: Notification) {
+        if let index = notification.userInfo?["index"] as? Int {
+            let indexPath = IndexPath(row: index, section: 0)
+            if let cell = tableView.cellForRow(at: indexPath) as? ImagesListCell {
+                let photo = presenter.getPhotos()[index]
+                cell.setIsLiked(photo.isLiked)
+            }
+        }
+    }
+    
+    // MARK: Segue Handling
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "ShowSingleImage" {
@@ -38,6 +69,8 @@ final class ImagesListViewController: UIViewController {
         }
     }
 }
+
+// MARK: - UITableViewDataSource, UITableViewDelegate
 
 extension ImagesListViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -71,6 +104,8 @@ extension ImagesListViewController: UITableViewDataSource, UITableViewDelegate {
     }
 }
 
+// MARK: - ImagesListPresenterDelegate
+
 extension ImagesListViewController: ImagesListPresenterDelegate {
     func updateTableViewAnimated() {
         let oldCount = presenter.getPhotos().count
@@ -98,6 +133,8 @@ extension ImagesListViewController: ImagesListPresenterDelegate {
         present(alert, animated: true, completion: nil)
     }
 }
+
+// MARK: - ImagesListCellDelegate
 
 extension ImagesListViewController: ImagesListCellDelegate {
     func imageListCellDidTapLike(_ cell: ImagesListCell) {

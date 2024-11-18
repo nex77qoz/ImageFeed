@@ -1,13 +1,18 @@
 import Foundation
 
-final class ProfileService {
+// MARK: - Profile Service
+
+final class ProfileService: ProfileServiceProtocol {
+    
+    // MARK: - Singleton
+    
+    static let shared = ProfileService()
     
     // MARK: - Properties
     
-    static let shared = ProfileService()
     private let urlSession = URLSession.shared
     private var task: URLSessionTask?
-    private var profile: Profile?
+    private(set) var profile: ProfileResult?
     
     // MARK: - Initialization
     

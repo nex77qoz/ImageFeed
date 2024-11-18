@@ -1,10 +1,14 @@
 import UIKit
 import WebKit
 
+// MARK: - WebViewViewControllerDelegate
+
 protocol WebViewViewControllerDelegate: AnyObject {
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String)
     func webViewViewControllerDidCancel(_ vc: WebViewViewController)
 }
+
+// MARK: - WebViewViewControllerProtocol
 
 public protocol WebViewViewControllerProtocol: AnyObject {
     var presenter: WebViewPresenterProtocol? { get set }
@@ -13,7 +17,10 @@ public protocol WebViewViewControllerProtocol: AnyObject {
     func setProgressHidden(_ isHidden: Bool)
 }
 
-final class WebViewViewController: UIViewController & WebViewViewControllerProtocol {
+// MARK: - WebViewViewController
+
+final class WebViewViewController: UIViewController, WebViewViewControllerProtocol {
+    
     var presenter: WebViewPresenterProtocol?
 
     @IBOutlet private var webView: WKWebView!
@@ -21,6 +28,8 @@ final class WebViewViewController: UIViewController & WebViewViewControllerProto
 
     weak var delegate: WebViewViewControllerDelegate?
     
+    // MARK: - Lifecycle
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -42,7 +51,9 @@ final class WebViewViewController: UIViewController & WebViewViewControllerProto
         super.viewWillDisappear(animated)
         webView.removeObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress), context: nil)
     }
-
+    
+    // MARK: - KVO
+    
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         if keyPath == #keyPath(WKWebView.estimatedProgress) {
             presenter?.didUpdateProgressValue(webView.estimatedProgress)
@@ -51,6 +62,8 @@ final class WebViewViewController: UIViewController & WebViewViewControllerProto
         }
     }
 
+    // MARK: - Public Methods
+    
     func load(request: URLRequest) {
         webView.load(request)
     }
@@ -63,6 +76,8 @@ final class WebViewViewController: UIViewController & WebViewViewControllerProto
         progressView.isHidden = isHidden
     }
 }
+
+// MARK: - WKNavigationDelegate
 
 extension WebViewViewController: WKNavigationDelegate {
     func webView(

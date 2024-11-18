@@ -1,21 +1,23 @@
 import Foundation
 import WebKit
 
-// MARK: - Extensions
+// MARK: - Notification Names
 
 extension Notification.Name {
     static let didLogout = Notification.Name("ProfileLogoutServiceDidLogout")
 }
 
+// MARK: - Profile Logout Service
+
 final class ProfileLogoutService {
     
-    // MARK: - Properties
+    // MARK: - Singleton
     
     static let shared = ProfileLogoutService()
     
     // MARK: - Initialization
     
-    private init() { }
+    private init() {}
     
     // MARK: - Public Methods
     

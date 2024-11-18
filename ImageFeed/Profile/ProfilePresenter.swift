@@ -1,13 +1,22 @@
 import Foundation
 
+// MARK: - Profile Presenter
+
 final class ProfilePresenter: ProfileViewPresenterProtocol {
+    
+    // MARK: - Dependencies
+    
     weak var view: ProfileViewControllerProtocol?
     private let profileService: ProfileServiceProtocol
     private let profileImageService: ProfileImageServiceProtocol
     private let tokenStorage: OAuth2TokenStorage
     private let logoutService: ProfileLogoutService
     
+    // MARK: - Properties
+    
     private(set) var profile: Profile?
+    
+    // MARK: - Initialization
     
     init(
         profileService: ProfileServiceProtocol,
@@ -21,17 +30,22 @@ final class ProfilePresenter: ProfileViewPresenterProtocol {
         self.logoutService = logoutService
     }
     
+    // MARK: - View Lifecycle
+    
     func viewDidLoad() {
         updateProfileDetails()
         setupProfileImageObserver()
     }
     
+    // MARK: - Logout
+    
     func didTapLogoutButton() {
         logoutService.logout()
     }
     
+    // MARK: - Profile Details
+    
     func updateProfileDetails() {
-        // For testing purposes, allow empty token
         let token = tokenStorage.token ?? ""
         
         profileService.fetchProfile(token) { [weak self] result in
@@ -42,8 +56,6 @@ final class ProfilePresenter: ProfileViewPresenterProtocol {
                 let profile = Profile(profileResult: profileResult)
                 self.profile = profile
                 self.view?.updateUI(with: profile)
-                
-                // Fetch avatar URL after profile is loaded
                 self.fetchProfileImageURL(profile.username)
                 
             case .failure(let error):
@@ -52,10 +64,14 @@ final class ProfilePresenter: ProfileViewPresenterProtocol {
         }
     }
     
+    // MARK: - Avatar
+    
     func updateAvatar() {
         guard let username = profile?.username else { return }
         fetchProfileImageURL(username)
     }
+    
+    // MARK: - Fetch Profile Image URL
     
     private func fetchProfileImageURL(_ username: String) {
         profileImageService.fetchProfileImageURL(username) { [weak self] result in
@@ -72,6 +88,8 @@ final class ProfilePresenter: ProfileViewPresenterProtocol {
         }
     }
     
+    // MARK: - Profile Image Observer
+    
     private func setupProfileImageObserver() {
         NotificationCenter.default.addObserver(
             self,
@@ -80,6 +98,8 @@ final class ProfilePresenter: ProfileViewPresenterProtocol {
             object: nil
         )
     }
+    
+    // MARK: - Handle Profile Image Update
     
     @objc
     private func handleProfileImageUpdate() {

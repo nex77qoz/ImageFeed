@@ -57,10 +57,20 @@ class Photo {
 
 // MARK: - Services
 
+protocol ImagesListServiceProtocol {
+    var photos: [Photo] { get }
+    func fetchPhotosNextPage()
+    func changeLike(photoId: String, isLike: Bool, completion: @escaping (Result<Void, Error>) -> Void)
+}
+
+extension ImagesListService: ImagesListServiceProtocol {
+    
+}
+
 final class ImagesListService {
     // MARK: - Singleton
     
-    static let shared = ImagesListService()
+    internal static var shared = ImagesListService()
     
     // MARK: - Notifications
     

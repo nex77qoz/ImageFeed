@@ -8,7 +8,12 @@ protocol ImagesListPresenterDelegate: AnyObject {
 
 class ImagesListPresenter {
     weak var delegate: ImagesListPresenterDelegate?
-    private let imagesListService = ImagesListService.shared
+    private let imagesListService: ImagesListServiceProtocol
+    
+    init(imagesListService: ImagesListServiceProtocol = ImagesListService.shared) {
+            self.imagesListService = imagesListService
+        }
+    
     private var photos: [Photo] = []
     private let showSingleImageSegueIdentifier = "ShowSingleImage"
     private let dateFormatter: ISO8601DateFormatter = {
@@ -19,19 +24,19 @@ class ImagesListPresenter {
     // Плейсхолдер изображение
     private let placeholderImage = UIImage(named: "placeholder")
     
-    public func getPhotos() -> [Photo] {
-        return photos
+    func getPhotos() -> [Photo] {
+        return imagesListService.photos
     }
     
     func viewDidLoad() {
-        imagesListService.fetchPhotosNextPage()
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(updateTableViewAnimated),
-            name: ImagesListService.didChangeNotification,
-            object: nil
-        )
-    }
+            imagesListService.fetchPhotosNextPage()
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(updateTableViewAnimated),
+                name: ImagesListService.didChangeNotification,
+                object: nil
+            )
+        }
     
     deinit {
         NotificationCenter.default.removeObserver(self, name: ImagesListService.didChangeNotification, object: nil)
@@ -61,7 +66,7 @@ class ImagesListPresenter {
     }
     
     func tableViewNumberOfRowsInSection() -> Int {
-        return photos.count
+        return imagesListService.photos.count
     }
     
     func tableViewCellForRow(at indexPath: IndexPath) -> (Photo, UIImage?) {

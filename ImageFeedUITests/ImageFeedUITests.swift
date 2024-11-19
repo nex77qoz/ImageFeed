@@ -18,12 +18,12 @@ final class ImageFeedUITests: XCTestCase {
         sleep(3)
         
         webViewsQuery/*@START_MENU_TOKEN@*/.textFields["Email address"]/*[[".otherElements[\"Connect ImageFeed + Unsplash | Unsplash\"].textFields[\"Email address\"]",".textFields[\"Email address\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.tap()
-        webViewsQuery/*@START_MENU_TOKEN@*/.textFields["Email address"]/*[[".otherElements[\"Connect ImageFeed + Unsplash | Unsplash\"].textFields[\"Email address\"]",".textFields[\"Email address\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.typeText("nex77qoz@gmail.com")
+        webViewsQuery/*@START_MENU_TOKEN@*/.textFields["Email address"]/*[[".otherElements[\"Connect ImageFeed + Unsplash | Unsplash\"].textFields[\"Email address\"]",".textFields[\"Email address\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.typeText("<email>")
         
         sleep(3)
         
         webViewsQuery/*@START_MENU_TOKEN@*/.secureTextFields["Password"]/*[[".otherElements[\"Connect ImageFeed + Unsplash | Unsplash\"].secureTextFields[\"Password\"]",".secureTextFields[\"Password\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.tap()
-        webViewsQuery/*@START_MENU_TOKEN@*/.secureTextFields["Password"]/*[[".otherElements[\"Connect ImageFeed + Unsplash | Unsplash\"].secureTextFields[\"Password\"]",".secureTextFields[\"Password\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.typeText("M54dfvqd")
+        webViewsQuery/*@START_MENU_TOKEN@*/.secureTextFields["Password"]/*[[".otherElements[\"Connect ImageFeed + Unsplash | Unsplash\"].secureTextFields[\"Password\"]",".secureTextFields[\"Password\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.typeText("<password>")
         webViewsQuery/*@START_MENU_TOKEN@*/.buttons["Login"]/*[[".otherElements[\"Connect ImageFeed + Unsplash | Unsplash\"].buttons[\"Login\"]",".buttons[\"Login\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.tap()
         
         let tablesQuery = app.tables

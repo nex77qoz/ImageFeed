@@ -38,7 +38,6 @@ final class SingleImageViewController: UIViewController {
         let activityViewController = UIActivityViewController(activityItems: [image], applicationActivities: nil)
         present(activityViewController, animated: true)
     }
-    
     @IBAction func didTapBackButton(_ sender: Any) {
         dismiss(animated: true, completion: nil)
     }

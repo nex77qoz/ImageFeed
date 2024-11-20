@@ -6,14 +6,16 @@
 //
 
 import UIKit
+import Kingfisher
 
 final class ProfileViewController: UIViewController {
     private let imageView = UIImageView()
     private let nameLabel = UILabel()
     private let nicknameLabel = UILabel()
     private let profileDescription = UILabel()
+    private var profileImageServiceObserver: NSObjectProtocol?
+    private let oauth2TokenStorage = OAuth2TokenStorage.shared
     
-
     override func viewDidLoad() {
         super.viewDidLoad()
         showProfileImage()
@@ -21,12 +23,27 @@ final class ProfileViewController: UIViewController {
         showNicknameLabel()
         showProfileDescription()
         showExitButton()
+        updateProfileDetails()
+        view.backgroundColor = .ypBlack
         
+        profileImageServiceObserver = NotificationCenter.default.addObserver(
+            forName: ProfileImageService.didChangeNotification, object: nil, queue: .main) { [weak self] _ in
+                guard let self = self else { return }
+                self.updateAvatar()
+            }
     }
-    
+    private func updateAvatar() {
+        guard
+            let avatarURL = ProfileImageService.shared.avatarURL,
+            let url = URL(string: avatarURL)
+                else { return }
+        imageView.kf.setImage(with: url)
+    }
+    // MARK: - Рисуем интерфейс
     private func showProfileImage() {
-        let profileImage = UIImage(named: "profileImage")
-        imageView.image = profileImage
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        imageView.layer.cornerRadius = 35
         imageView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(imageView)
         
@@ -39,7 +56,7 @@ final class ProfileViewController: UIViewController {
     }
     
     private func showName() {
-        nameLabel.text = "Екатерина Новикова"
+        nameLabel.text = ""
         nameLabel.textColor = .ypWhite
         nameLabel.font = .systemFont(ofSize: 18, weight: .bold)
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -53,7 +70,7 @@ final class ProfileViewController: UIViewController {
     }
     
     private func showNicknameLabel() {
-        nicknameLabel.text = "@ekaterina_nov"
+        nicknameLabel.text = ""
         nicknameLabel.textColor = .ypGray
         nicknameLabel.font = .systemFont(ofSize: 13, weight: .regular)
         nicknameLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -67,7 +84,7 @@ final class ProfileViewController: UIViewController {
     }
     
     private func showProfileDescription() {
-        profileDescription.text = "Hello, World!"
+        profileDescription.text = ""
         profileDescription.textColor = .ypWhite
         profileDescription.font = .systemFont(ofSize: 13, weight: .regular)
         profileDescription.translatesAutoresizingMaskIntoConstraints = false
@@ -100,8 +117,31 @@ final class ProfileViewController: UIViewController {
     
     @objc
     private func didTapExitButton() {
-        print("Exit button tapped")
+        oauth2TokenStorage.token = nil
     }
     
+    // MARK: - Получение данных профиля
+    
+    private func updateProfileDetails() {
+        guard let token = OAuth2TokenStorage.shared.token else {
+            print("[ProfileViewController updateProfileDetails]: Токен недоступен")
+            return
+        }
+        
+        ProfileService.shared.fetchProfile(token) { [weak self] result in
+            switch result {
+            case .success(let profile):
+                self?.updateUI(with: profile)
+            case .failure(let error):
+                print("[ProfileViewController updateProfileDetails]: Ошибка получения профиля: \(error)")
+            }
+        }
+    }
+    
+    private func updateUI(with profile: Profile) {
+        nameLabel.text = profile.name
+        nicknameLabel.text = profile.loginName
+        profileDescription.text = profile.bio
+        updateAvatar()
+    }
 }
-

@@ -8,6 +8,10 @@
 import UIKit
 import WebKit
 
+enum WebViewConstants {
+    static let unsplashAuthorizeURLString = "https://unsplash.com/oauth/authorize"
+}
+
 protocol WebViewViewControllerDelegate: AnyObject {
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String)
     func webViewViewControllerDidCancel(_ vc: WebViewViewController)
@@ -18,38 +22,23 @@ final class WebViewViewController: UIViewController{
     @IBOutlet weak var progressView: UIProgressView!
     
     weak var delegate: WebViewViewControllerDelegate?
+    private var estimatedProgressObservation: NSKeyValueObservation?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         loadAuthView()
         webView.navigationDelegate = self
-    }
-    
-    override func observeValue(
-        forKeyPath keyPath: String?,
-        of object: Any?,
-        change: [NSKeyValueChangeKey : Any]?,
-        context: UnsafeMutableRawPointer?) {
-            if keyPath == #keyPath(WKWebView.estimatedProgress) {
-                updateProgress()
-            } else {
-                super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
-            }
-        }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        webView.addObserver(
-            self,
-            forKeyPath: #keyPath(WKWebView.estimatedProgress),
-            options: .new,
-            context: nil)
+        estimatedProgressObservation = webView.observe(
+                    \.estimatedProgress,
+                    options: [],
+                    changeHandler: { [weak self] _, _ in
+                        guard let self = self else { return }
+                        self.updateProgress()
+                    })
         updateProgress()
     }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        webView.removeObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress), context: nil)
+    deinit {
+        estimatedProgressObservation?.invalidate()
     }
     
     @IBAction private func didTapBackButton(_ sender: Any?) {
@@ -63,7 +52,7 @@ final class WebViewViewController: UIViewController{
     
     private func loadAuthView() {
         guard var urlComponents = URLComponents(string: WebViewConstants.unsplashAuthorizeURLString) else {
-            assertionFailure("Не удалось создать URLComponents из строки \(WebViewConstants.unsplashAuthorizeURLString)")
+            assertionFailure("[WebViewViewController loadAuthView]: Не удалось создать URLComponents из строки \(WebViewConstants.unsplashAuthorizeURLString)")
             return
         }
         
@@ -75,17 +64,15 @@ final class WebViewViewController: UIViewController{
         ]
         
         guard let url = urlComponents.url else {
-            assertionFailure("Не удалось получить URL из URLComponents")
+            assertionFailure("[WebViewViewController loadAuthView]: Не удалось получить URL из URLComponents")
             return
         }
         
         let request = URLRequest(url: url)
         webView.load(request)
+
+        updateProgress()
     }
-    private enum WebViewConstants {
-        static let unsplashAuthorizeURLString = "https://unsplash.com/oauth/authorize"
-    }
-    
 }
 
 extension WebViewViewController: WKNavigationDelegate {
@@ -104,14 +91,13 @@ extension WebViewViewController: WKNavigationDelegate {
     private func code(from navigationAction: WKNavigationAction) -> String? {
         if
             let url = navigationAction.request.url,
-            let urlcomponents = URLComponents(string: url.absoluteString),
-            urlcomponents.path == "/oauth/authorize/native",
-            let items = urlcomponents.queryItems,
+            let urlComponents = URLComponents(string: url.absoluteString),
+            urlComponents.path == "/oauth/authorize/native",
+            let items = urlComponents.queryItems,
             let codeItem = items.first(where: { $0.name == "code" })
         {
             return codeItem.value
         } else {
-            assertionFailure("Не удалось извлечь код авторизации из URL \(String(describing: navigationAction.request.url))")
             return nil
         }
     }

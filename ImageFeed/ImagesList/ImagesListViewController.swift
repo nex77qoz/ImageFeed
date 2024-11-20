@@ -9,7 +9,8 @@ import UIKit
 
 final class ImagesListViewController: UIViewController {
     // MARK: - IB Outlets
-    @IBOutlet private var tableView: UITableView!
+    @IBOutlet weak var tableView: UITableView!
+    
     
     // MARK: - Private Properties
     private let photosName: [String] = Array(0..<20).map{ "\($0)" }
@@ -26,14 +27,14 @@ final class ImagesListViewController: UIViewController {
         super.viewDidLoad()
         tableView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
     }
-    
+
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == showSingleImageSegueIdentifier {
             guard
                 let viewController = segue.destination as? SingleImageViewController,
                 let indexPath = sender as? IndexPath
             else {
-                assertionFailure("Invalid segue destination")
+                assertionFailure("[ImagesListViewController prepare for]: Некорректный переход")
                 return
             }
             

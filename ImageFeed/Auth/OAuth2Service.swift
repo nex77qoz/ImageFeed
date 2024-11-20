@@ -1,9 +1,3 @@
-//
-//  OAuth2Service.swift
-//  ImageFeed
-//
-//  Created by Максим Бабкин on 29.09.2024.
-//
 import UIKit
 
 enum AuthServiceError: Error {
@@ -11,15 +5,22 @@ enum AuthServiceError: Error {
 }
 
 final class OAuth2Service {
+    
+    // MARK: - Properties
+    
     static let shared = OAuth2Service()
-
+    
     private let dataStorage = OAuth2TokenStorage.shared
     private let urlSession = URLSession.shared
     
     private var task: URLSessionTask?
     private var lastCode: String?
     
+    // MARK: - Initialization
+    
     private init() { }
+    
+    // MARK: - Public Methods
     
     func fetchOAuthToken(_ code: String, completion: @escaping (Result<String, Error>) -> Void) {
         assert(Thread.isMainThread)
@@ -61,6 +62,8 @@ final class OAuth2Service {
         task.resume()
     }
     
+    // MARK: - Private Methods
+    
     private func makeOAuthTokenRequest(code: String) -> URLRequest? {
         var components = URLComponents(string: "https://unsplash.com/oauth/token")
         
@@ -81,13 +84,5 @@ final class OAuth2Service {
         request.httpMethod = "POST"
         
         return request
-    }
-    
-    private struct OAuthTokenResponseBody: Codable {
-        let accessToken: String
-        
-        enum CodingKeys: String, CodingKey {
-            case accessToken = "access_token"
-        }
     }
 }

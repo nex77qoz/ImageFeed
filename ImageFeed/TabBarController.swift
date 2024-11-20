@@ -1,33 +1,54 @@
-//
-//  TabBarController.swift
-//  ImageFeed
-//
-//  Created by Максим Бабкин on 30.10.2024.
-//
-
 import UIKit
 
 final class TabBarController: UITabBarController {
+    // MARK: - Lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupViewControllers()
+        setupNavigationBarAppearance()
+        setupTabBarAppearance()
+    }
+    
+    // MARK: - Private Methods
+    
+    private func setupViewControllers() {
         let storyboard = UIStoryboard(name: "Main", bundle: .main)
         let imagesListViewController = storyboard.instantiateViewController(withIdentifier: "ImagesListViewController")
         let profileViewController = ProfileViewController()
         
         profileViewController.tabBarItem = UITabBarItem(
             title: "",
-            image: UIImage(named: "tab_editorial_active"),
+            image: UIImage(named: "tab_profile_active"),
             selectedImage: nil)
         imagesListViewController.tabBarItem = UITabBarItem(
             title: "",
-            image: UIImage(named: "tab_profile_active"),
+            image: UIImage(named: "tab_editorial_active"),
             selectedImage: nil)
         
-        // Встраивание в навигационные контроллеры
         let imagesNavController = UINavigationController(rootViewController: imagesListViewController)
         let profileNavController = UINavigationController(rootViewController: profileViewController)
         
-        // Назначение контроллеров в TabBar
         viewControllers = [imagesNavController, profileNavController]
+    }
+    
+    private func setupNavigationBarAppearance() {
+        let navigationBarAppearance = UINavigationBarAppearance()
+        navigationBarAppearance.configureWithOpaqueBackground()
+        navigationBarAppearance.backgroundColor = .ypBlack
+        
+        guard let viewControllers = viewControllers else { return }
+        
+        for navController in viewControllers {
+            if let nav = navController as? UINavigationController {
+                nav.navigationBar.standardAppearance = navigationBarAppearance
+                nav.navigationBar.scrollEdgeAppearance = navigationBarAppearance
+                nav.navigationBar.tintColor = .white
+            }
+        }
+    }
+    
+    private func setupTabBarAppearance() {
+        tabBar.backgroundColor = .ypBlack
     }
 }

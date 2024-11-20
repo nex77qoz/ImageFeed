@@ -81,7 +81,11 @@ final class ProfileViewController: UIViewController {
     }
     
     private func showExitButton() {
-        let button = UIButton.systemButton(with: UIImage(named: "Exit")!, target: self, action: #selector(Self.didTapExitButton))
+        guard let exitImage = UIImage(named: "Exit") else {
+            fatalError("Не найдено изображение Exit")
+        }
+        let button = UIButton.systemButton(with: exitImage, target: self, action: #selector(Self.didTapExitButton))
+
         button.tintColor = .ypRed
         view.addSubview(button)
         button.translatesAutoresizingMaskIntoConstraints = false

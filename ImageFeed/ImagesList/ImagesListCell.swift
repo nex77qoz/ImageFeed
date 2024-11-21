@@ -1,20 +1,23 @@
 import UIKit
 
+// MARK: - ImagesListCellDelegate
+
 protocol ImagesListCellDelegate: AnyObject {
     func imageListCellDidTapLike(_ cell: ImagesListCell)
 }
 
-class ImagesListCell: UITableViewCell {
-    // MARK: - Properties
+// MARK: - ImagesListCell
 
+class ImagesListCell: UITableViewCell {
     static let reuseIdentifier = "ImagesListCell"
     
     weak var delegate: ImagesListCellDelegate?
     
+    // MARK: - Subviews
+    
     let cellImage: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = 16
         return imageView
@@ -38,54 +41,64 @@ class ImagesListCell: UITableViewCell {
         return label
     }()
     
+    // MARK: - Gradient Layer
+    
     private var gradientLayer: CAGradientLayer?
     
-    // MARK: - Initializers
-
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
-        setupSubviews()
-        likeButton.addTarget(self, action: #selector(likeButtonTapped), for: .touchUpInside)
-        selectionStyle = .none
-        contentView.backgroundColor = .ypBlack
-        backgroundColor = .ypBlack
-    }
-    
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        setupSubviews()
-        likeButton.addTarget(self, action: #selector(likeButtonTapped), for: .touchUpInside)
-        selectionStyle = .none
-        contentView.backgroundColor = .ypBlack
-        backgroundColor = .ypBlack
-    }
-    
-    // MARK: - Override Methods
-
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        cellImage.image = nil
-        removeGradientAnimation()
-    }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        gradientLayer?.frame = cellImage.bounds
-    }
-    
     // MARK: - Actions
-
+    
     @objc private func likeButtonTapped() {
         delegate?.imageListCellDidTapLike(self)
     }
     
-    // MARK: - Public Methods
-
+    // MARK: - Setup
+    
     func setIsLiked(_ isLiked: Bool) {
         let likeImageName = isLiked ? "Active" : "No Active"
         let likeImage = UIImage(named: likeImageName)?.withRenderingMode(.alwaysOriginal)
         likeButton.setImage(likeImage, for: .normal)
     }
+    
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        setup()
+    }
+    
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setup()
+    }
+    
+    private func setup() {
+        setupSubviews()
+        likeButton.addTarget(self, action: #selector(likeButtonTapped), for: .touchUpInside)
+        selectionStyle = .none
+        contentView.backgroundColor = .ypBlack
+        backgroundColor = .ypBlack
+    }
+    
+    private func setupSubviews() {
+        contentView.addSubview(cellImage)
+        contentView.addSubview(likeButton)
+        contentView.addSubview(dateLabel)
+        
+        NSLayoutConstraint.activate([
+            cellImage.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4),
+            cellImage.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            cellImage.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            cellImage.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -4),
+            
+            likeButton.topAnchor.constraint(equalTo: cellImage.topAnchor, constant: 12),
+            likeButton.trailingAnchor.constraint(equalTo: cellImage.trailingAnchor, constant: -12),
+            likeButton.widthAnchor.constraint(equalToConstant: 21),
+            likeButton.heightAnchor.constraint(equalToConstant: 18),
+            
+            dateLabel.leadingAnchor.constraint(equalTo: cellImage.leadingAnchor, constant: 8),
+            dateLabel.bottomAnchor.constraint(equalTo: cellImage.bottomAnchor, constant: -8)
+        ])
+    }
+    
+    // MARK: - Gradient Animation
     
     func addGradientAnimation() {
         gradientLayer?.removeFromSuperlayer()
@@ -119,26 +132,63 @@ class ImagesListCell: UITableViewCell {
         gradientLayer = nil
     }
     
-    // MARK: - Private Methods
-
-    private func setupSubviews() {
-        contentView.addSubview(cellImage)
-        contentView.addSubview(likeButton)
-        contentView.addSubview(dateLabel)
+    // MARK: - Lifecycle
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        cellImage.image = nil
+        cellImage.contentMode = .scaleAspectFill
+        removeGradientAnimation()
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        gradientLayer?.frame = cellImage.bounds
+    }
+    
+    // MARK: - Configuration
+    private let displayDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd MMMM yyyy"
+        formatter.locale = Locale(identifier: "ru_RU")
+        return formatter
+    }()
+    
+    func configCell(for photo: Photo, with placeholderImage: UIImage?) {
+        if let createdAt = photo.createdAt {
+            dateLabel.text = displayDateFormatter.string(from: createdAt)
+        } else {
+            dateLabel.text = ""
+        }
+        setIsLiked(photo.isLiked)
         
-        NSLayoutConstraint.activate([
-            cellImage.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4),
-            cellImage.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            cellImage.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            cellImage.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -4),
-            
-            likeButton.topAnchor.constraint(equalTo: cellImage.topAnchor, constant: 12),
-            likeButton.trailingAnchor.constraint(equalTo: cellImage.trailingAnchor, constant: -12),
-            likeButton.widthAnchor.constraint(equalToConstant: 21),
-            likeButton.heightAnchor.constraint(equalToConstant: 18),
-            
-            dateLabel.leadingAnchor.constraint(equalTo: cellImage.leadingAnchor, constant: 8),
-            dateLabel.bottomAnchor.constraint(equalTo: cellImage.bottomAnchor, constant: -8)
-        ])
+        cellImage.kf.indicatorType = .none
+        
+        addGradientAnimation()
+        
+        if let url = URL(string: photo.thumbImageURL) {
+            cellImage.kf.setImage(
+                with: url,
+                placeholder: placeholderImage,
+                options: [
+                    .transition(.fade(0.3)),
+                    .cacheOriginalImage
+                ]) { result in
+                    DispatchQueue.main.async {
+                        self.removeGradientAnimation()
+                        switch result {
+                            case .success(_):
+                                self.cellImage.contentMode = .scaleAspectFill
+                            case .failure(_):
+                                self.cellImage.image = placeholderImage
+                                self.cellImage.contentMode = .center
+                        }
+                    }
+                }
+        } else {
+            removeGradientAnimation()
+            cellImage.image = placeholderImage
+            cellImage.contentMode = .center
+        }
     }
 }

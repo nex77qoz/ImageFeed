@@ -1,5 +1,7 @@
 import Foundation
 
+// MARK: - NetworkError
+
 enum NetworkError: Error {
     case httpStatusCode(Int)
     case urlRequestError(Error)
@@ -9,7 +11,11 @@ enum NetworkError: Error {
     case noData
 }
 
+// MARK: - URLSession Extensions
+
 extension URLSession {
+    // MARK: Data Task
+    
     func dataTask(
         for request: URLRequest,
         completion: @escaping (Result<Data, Error>) -> Void
@@ -44,24 +50,26 @@ extension URLSession {
         return task
     }
     
+    // MARK: Object Task
+    
     func objectTask<T: Decodable>(
         for request: URLRequest,
         completion: @escaping (Result<T, Error>) -> Void
     ) -> URLSessionTask {
         let task = dataTask(for: request) { (result: Result<Data, Error>) in
             switch result {
-            case .success(let data):
-                do {
-                    let decoder = JSONDecoder()
-                    let decodedObject = try decoder.decode(T.self, from: data)
-                    completion(.success(decodedObject))
-                } catch {
-                    print("[objectTask]: NetworkError.decodingError - \(error.localizedDescription), Данные: \(String(data: data, encoding: .utf8) ?? "")")
-                    completion(.failure(NetworkError.decodingError(error)))
-                }
-            case .failure(let error):
-                print("[objectTask]: Error - \(error.localizedDescription)")
-                completion(.failure(error))
+                case .success(let data):
+                    do {
+                        let decoder = JSONDecoder()
+                        let decodedObject = try decoder.decode(T.self, from: data)
+                        completion(.success(decodedObject))
+                    } catch {
+                        print("[objectTask]: NetworkError.decodingError - \(error.localizedDescription), Данные: \(String(data: data, encoding: .utf8) ?? "")")
+                        completion(.failure(NetworkError.decodingError(error)))
+                    }
+                case .failure(let error):
+                    print("[objectTask]: Error - \(error.localizedDescription)")
+                    completion(.failure(error))
             }
         }
         return task

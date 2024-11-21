@@ -31,18 +31,16 @@ struct UrlsResult: Decodable {
     let thumb: String
 }
 
+// MARK: - Photo Model
+
 class Photo {
-    // MARK: - Properties
-    
     let id: String
     let size: CGSize
     let createdAt: Date?
     let welcomeDescription: String?
     let thumbImageURL: String
-    let largeImageURL: String
+    let largeImageURL: String?
     var isLiked: Bool
-    
-    // MARK: - Initializer
     
     init(id: String, size: CGSize, createdAt: Date?, welcomeDescription: String?, thumbImageURL: String, largeImageURL: String, isLiked: Bool) {
         self.id = id
@@ -57,10 +55,18 @@ class Photo {
 
 // MARK: - Services
 
-final class ImagesListService {
+protocol ImagesListServiceProtocol {
+    var photos: [Photo] { get }
+    func fetchPhotosNextPage()
+    func changeLike(photoId: String, isLike: Bool, completion: @escaping (Result<Void, Error>) -> Void)
+}
+
+// MARK: - ImagesListService
+
+final class ImagesListService: ImagesListServiceProtocol {
     // MARK: - Singleton
     
-    static let shared = ImagesListService()
+    internal static var shared = ImagesListService()
     
     // MARK: - Notifications
     
@@ -74,7 +80,7 @@ final class ImagesListService {
     
     private let urlSession = URLSession.shared
     private var task: URLSessionTask?
-    private let dateFormatter: ISO8601DateFormatter = {
+    private let iso8601DateFormatter: ISO8601DateFormatter = {
         let formatter = ISO8601DateFormatter()
         return formatter
     }()
@@ -176,11 +182,12 @@ final class ImagesListService {
         let width = CGFloat(photoResult.width)
         let height = CGFloat(photoResult.height)
         let size = CGSize(width: width, height: height)
-        let createdAt = photoResult.createdAt.flatMap { dateFormatter.date(from: $0) }
+        let createdAt = photoResult.createdAt.flatMap { iso8601DateFormatter.date(from: $0) }
         let description = photoResult.description
         let thumbImageURL = photoResult.urls.regular
         let largeImageURL = photoResult.urls.full
         let isLiked = photoResult.likedByUser
+        
         return Photo(
             id: id,
             size: size,
